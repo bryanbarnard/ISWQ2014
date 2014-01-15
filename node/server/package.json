@@ -1,0 +1,16 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "description": "rest api",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "api",
+    "rest"
+  ],
+  "author": "Bryan Barnard",
+  "license": "MIT"
+}

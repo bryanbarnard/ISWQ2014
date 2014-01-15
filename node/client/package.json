@@ -1,0 +1,19 @@
+{
+  "name": "iswq2014Client",
+  "version": "0.0.1",
+  "description": "api client",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "api",
+    "client"
+  ],
+  "author": "Bryan Barnard",
+  "license": "MIT",
+  "dependencies": {
+    "request": "~2.31.0"
+  }
+}
