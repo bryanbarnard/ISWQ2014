@@ -1,0 +1,173 @@
+HTTP/1.1 200 OK
+content-type: application/vnd.collection+json
+Date: Thu, 23 Jan 2014 22:07:59 GMT
+Connection: keep-alive
+Transfer-Encoding: chunked
+
+{
+  "collection": {
+    "version": "1.0",
+    "href": "http://192.241.203.50/",
+    "links": [
+      {
+        "rel": "home",
+        "href": "http://192.241.203.50"
+      }
+    ],
+    "items": [
+      {
+        "href": "http://192.241.203.50/mildred",
+        "data": [
+          {
+            "name": "name",
+            "value": "mildred",
+            "prompt": "name"
+          },
+          {
+            "name": "email",
+            "value": "mildred@example.com",
+            "prompt": "email"
+          }
+        ],
+        "links": [
+          {
+            "rel": "alternate",
+            "href": "http://example.com/blogs/mildred",
+            "prompt": "blog"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50/mike",
+        "data": [
+          {
+            "name": "name",
+            "value": "mike",
+            "prompt": "name"
+          },
+          {
+            "name": "email",
+            "value": "mike@example.com",
+            "prompt": "email"
+          }
+        ],
+        "links": [
+          {
+            "rel": "alternate",
+            "href": "http://example.com/blogs/mike",
+            "prompt": "blog"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50/mary",
+        "data": [
+          {
+            "name": "name",
+            "value": "mary",
+            "prompt": "name"
+          },
+          {
+            "name": "email",
+            "value": "mary@example.com",
+            "prompt": "email"
+          }
+        ],
+        "links": [
+          {
+            "rel": "alternate",
+            "href": "http://example.com/blogs/mary",
+            "prompt": "blog"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50/mark",
+        "data": [
+          {
+            "name": "name",
+            "value": "mark",
+            "prompt": "name"
+          },
+          {
+            "name": "email",
+            "value": "mark@example.com",
+            "prompt": "email"
+          }
+        ],
+        "links": [
+          {
+            "rel": "alternate",
+            "href": "http://example.com/blogs/mark",
+            "prompt": "blog"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50/muffin",
+        "data": [
+          {
+            "name": "name",
+            "value": "muffin",
+            "prompt": "name"
+          },
+          {
+            "name": "email",
+            "value": "muffin@example.com",
+            "prompt": "email"
+          }
+        ],
+        "links": [
+          {
+            "rel": "alternate",
+            "href": "http://example.com/blogs/muffin",
+            "prompt": "blog"
+          }
+        ]
+      }
+    ],
+    "queries": [
+      {
+        "rel": "collection sort",
+        "prompt": "Sort by Name",
+        "href": "http://192.241.203.50/sortbyname"
+      },
+      {
+        "rel": "collection filter",
+        "prompt": "Filter by Name",
+        "href": "http://192.241.203.50/filterbyname",
+        "data": [
+          {
+            "name": "name",
+            "value": "",
+            "prompt": "Name"
+          }
+        ]
+      },
+      {
+        "rel": "collection sort",
+        "prompt": "Sort by Email",
+        "href": "http://192.241.203.50/sortbyemail"
+      }
+    ],
+    "template": {
+      "data": [
+        {
+          "name": "name",
+          "value": "",
+          "prompt": "Name"
+        },
+        {
+          "name": "email",
+          "value": "",
+          "prompt": "Email"
+        },
+        {
+          "name": "blog",
+          "value": "",
+          "prompt": "Blog"
+        }
+      ]
+    }
+  }
+}
