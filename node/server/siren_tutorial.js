@@ -1,18 +1,19 @@
 /*
- * Siren API Media Type Tutorial Implementation
- * Siren Spec: https://github.com/kevinswiber/siren
+ * siren API Media Type Sample Implementation
+ * siren Spec: https://github.com/kevinswiber/siren
  */
+
 var url =  require('url');
 var http = require('http');
 var port = process.env.PORT || 80;
-
 var path = '';
 var base = '';
-var cType = 'application/vnd.siren+json';
-var cj = {};
+var mediaType = 'application/vnd.siren+json';
+var sirenResponse = {};
 var friends = [];
 var pathfilter = '/favicon.ico /sortbyemail /sortbyname /filterbyname';
 
+//http request handler
 function handler(req, res) {
     base = 'http://' + req.headers.host;
     path = url.parse(req.url).pathname;
@@ -20,128 +21,99 @@ function handler(req, res) {
         path = '/';
     }
 
+    //populate data object friends
     getFriends();
-    createCjTemplate();
-    renderItems(friends);
-    renderQueries();
-    renderTemplate();
 
-    res.writeHead(200, 'OK', {'content-type': cType});
-    res.end(JSON.stringify(cj));
+    //create template siren response object
+    createSirenTemplate();
+
+    //populate response object
+    renderActions();
+    renderProperties();
+    renderEntities();
+    renderActions();
+    renderlinks();
+
+    res.writeHead(200, 'OK', {'content-type': mediaType});
+    res.end(JSON.stringify(sirenResponse));
 }
 
-// render write template (POST, PUT)
-function renderTemplate() {
-    var template = {};
-    var item = {};
-
-    template.data = [];
-
-    item = {};
-    item.name = 'name';
-    item.value = '';
-    item.prompt = 'Name';
-    template.data.push(item);
-
-    item = {};
-    item.name = 'email';
-    item.value = '';
-    item.prompt = 'Email';
-    template.data.push(item);
-
-    item = {};
-    item.name = 'blog';
-    item.value = '';
-    item.prompt = 'Blog';
-    template.data.push(item);
-
-    cj.collection.template = template;
+function renderClass() {
+    sirenResponse.class.push("order");
 }
 
-// the basic template for all Cj responses
-function createCjTemplate() {
-    cj.collection = {};
-    cj.collection.version = "1.0";
-    cj.collection.href = base + path;
+function renderProperties() {
+    sirenResponse.properties.orderNumber = 42;
+    sirenResponse.properties.itemCount = 3;
+    sirenResponse.properties.status = "pending";
+}
 
-    cj.collection.links = [];
-    cj.collection.links.push({'rel': 'home', 'href': base});
+// render entities
+function renderEntities() {
+    sirenResponse.entities.push(
+        {
+            "class": [ "items", "collection" ],
+            "rel": [ "http://x.io/rels/order-items" ],
+            "href": "http://api.x.io/orders/42/items"
+        }
+    );
 
-    cj.collection.items = [];
-    cj.collection.queries = [];
-    cj.collection.template = {};
+    sirenResponse.entities.push(
+        {
+            "class": [ "info", "customer" ],
+            "rel": [ "http://x.io/rels/customer" ],
+            "properties": {
+                "customerId": "pj123",
+                "name": "Peter Joseph"
+            },
+            "links": [
+                { "rel": [ "self" ], "href": "http://api.x.io/customers/pj123" }
+            ]
+        }
+    );
+}
+
+// render actions
+function renderActions() {
+    sirenResponse.actions.push(
+        {
+            "name": "add-item",
+            "title": "Add Item",
+            "method": "POST",
+            "href": "http://api.x.io/orders/42/items",
+            "type": "application/x-www-form-urlencoded",
+            "fields": [
+                { "name": "orderNumber", "type": "hidden", "value": "42" },
+                { "name": "productCode", "type": "text" },
+                { "name": "quantity", "type": "number" }
+            ]
+        }
+    );
 }
 
 // render supported queries as valid Cj query elements
-function renderQueries() {
-    var query = {};
-
-    query = {};
-    query.rel = 'collection sort';
-    query.prompt = 'Sort by Name';
-    query.href = base + '/sortbyname';
-    cj.collection.queries.push(query);
-
-    query = {};
-    query.rel = 'collection filter';
-    query.prompt = 'Filter by Name';
-    query.href = base + '/filterbyname';
-    query.data = [];
-    query.data[0] = {
-        'name': 'name',
-        'value': '',
-        'prompt': 'Name'
-    }
-    cj.collection.queries.push(query);
-
-    query = {};
-    query.rel = 'collection sort';
-    query.prompt = 'Sort by Email';
-    query.href = base + '/sortbyemail';
-    cj.collection.queries.push(query);
+function renderlinks() {
+    sirenResponse.links.push(
+        { "rel": [ "self" ], "href": "http://api.x.io/orders/42" },
+        { "rel": [ "previous" ], "href": "http://api.x.io/orders/41" },
+        { "rel": [ "next" ], "href": "http://api.x.io/orders/43" }
+    );
 }
 
-
-// render data object (friends) as valid Cj items
-function renderItems(coll) {
-    var i, x, item, p, d, l;
-
-    for (i = 0, x = coll.length; i < x; i++) {
-        if (path === '/' || path === '/' + coll[i].name) {
-            item = {};
-            item.href = base + '/' + coll[i].name;
-            item.data = [];
-            item.links = [];
-
-            d = 0;
-            l = 0
-            for (p in friends[i]) {
-                if (p === 'blog') {
-                    item.links[l++] = {
-                        'rel': 'alternate',
-                        'href': friends[i][p],
-                        'prompt': p
-                    }
-                }
-                else {
-                    item.data[d++] = {
-                        'name': p,
-                        'value': friends[i][p],
-                        'prompt': p
-                    }
-                }
-            }
-            cj.collection.items.push(item);
-        }
-    }
+// the basic template for all Siren Responses
+function createSirenTemplate() {
+    sirenResponse.class = [];
+    sirenResponse.properties = {};
+    sirenResponse.entities = [];
+    sirenResponse.actions = [];
+    sirenResponse.links = [];
 }
-
 
 // actual data to render
 // usually kept in external storage
+// populate the friends array with items
 function getFriends() {
     var item = {};
-
     friends = [];
 
     item = {};
@@ -174,21 +146,19 @@ function getFriends() {
     item.blog = 'http://example.com/blogs/muffin';
     friends.push(item);
 }
+
+
+//initialize http server
 http.createServer(handler).listen(port);
 
 
-// sample collection object
+// sample siren object
 /*
    {
-   "collection" :
-   {
-   "version" : "1.0",
-   "href" : URI,
+   "class" : [ARRAY],
+   "properties" : {},
+   "entities" : [ARRAY],
+   "actions" : [ARRAY],
    "links" : [ARRAY],
-   "items" : [ARRAY],
-   "queries" : [ARRAY],
-   "template" : {OBJECT},
-   "error" : {OBJECT}
-   }
    }
 */
