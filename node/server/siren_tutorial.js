@@ -28,6 +28,7 @@ function handler(req, res) {
     createSirenTemplate();
 
     //populate response object
+    renderClass();
     renderActions();
     renderProperties();
     renderEntities();
