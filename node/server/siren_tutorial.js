@@ -1,10 +1,14 @@
+/*
+ * Siren API Media Type Tutorial Implementation
+ * Siren Spec: https://github.com/kevinswiber/siren
+ */
 var url =  require('url');
 var http = require('http');
 var port = process.env.PORT || 80;
 
 var path = '';
 var base = '';
-var cType = 'application/vnd.collection+json';
+var cType = 'application/vnd.siren+json';
 var cj = {};
 var friends = [];
 var pathfilter = '/favicon.ico /sortbyemail /sortbyname /filterbyname';
@@ -134,7 +138,7 @@ function renderItems(coll) {
 
 
 // actual data to render
-// // usually kept in external storage
+// usually kept in external storage
 function getFriends() {
     var item = {};
 
