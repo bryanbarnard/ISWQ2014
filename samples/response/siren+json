@@ -1,3 +1,9 @@
+HTTP/1.1 200 OK
+content-type: application/vnd.siren+json
+Date: Sun, 02 Feb 2014 18:25:57 GMT
+Connection: keep-alive
+Transfer-Encoding: chunked
+
 {
   "class": [ "order" ],
   "properties": { 
