@@ -1,0 +1,22 @@
+## Curl Commands Based Tests ##
+
+# HEAD
+curl -is http://localhost:3000 \
+ -X HEAD \
+ -H 'accept: text/plain' \
+ -H 'Content-Type: text/plain' \
+ -H 'Connection: close'
+
+# GET
+curl -is http://localhost:3000 \
+ -X GET \
+ -H 'accept: text/plain' \
+ -H 'Content-Type: text/plain' \
+ -H 'Connection: close'
+
+# GET Invalid Request
+curl -is http://localhost:3000/test \
+ -X GET \
+ -H 'accept: text/plain' \
+ -H 'Content-Type: text/plain' \
+ -H 'Connection: close'
