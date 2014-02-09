@@ -2,7 +2,7 @@
   "name": "api",
   "version": "0.0.1",
   "description": "rest api",
-  "main": "api.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,5 +12,9 @@
     "rest"
   ],
   "author": "Bryan Barnard",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "restify": "~2.6.1",
+    "underscore": "~1.5.2"
+  }
 }
