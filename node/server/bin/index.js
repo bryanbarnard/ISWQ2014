@@ -1,27 +1,41 @@
 //entry point
+var util = require('util')
 var restify = require('../node_modules/restify');
+var items = require('./data.js').friends;
 var env_port = 3000;
+var path = '';
+var base = '';
+var mType = 'application/vnd.collection+json';
+var cj = {};
 
 restify.defaultResponseHeaders = false; // disable default headers altogether
 
+var sendInvalidRequestError = function (req, res, next) {
+    res.contentType = 'text/plain';
+    res.status(401);
+    res.send('we only accept content type ' + mType);
+}
+
 //[GET, HEAD]
 var respondDefault = function (req, res, next) {
-
-    if (req.is('text/plain')) {
-        res.contentType = 'text/plain';
-        res.status(200);
-        res.send('we accept content type text/plain');
-        //curl -is http://localhost:3000 -X GET -H 'connection: close' -H 'Content-Type: text/plain; charset=utf-8'
+    if (req.accepts(mType)) {
+        if (req.is(mType)) {
+            res.contentType = mType;
+            res.status(200);
+            res.send('accepted ' + mType);
+        } else {
+            res.contentType = 'text/plain';
+            res.status(407);
+            res.send('we only accept content type ' + mType);
+        }
     } else {
-        //curl -is http://localhost:3000 -X GET -H 'connection: close' -H 'Content-Type: application/json; charset=utf-8'
-        res.contentType = 'text/plain';
-        res.status(407);
-        res.send('we only accept content type text/plain');
+        sendInvalidRequestError(req, res, next);
     }
 }
 
 //[GET]
 var respondMovies = function (req, res, next) {
+    req.accepts(mType);
     res.contentType = 'application/json';
     res.status(200);
     res.send({movie: 'world'});
@@ -29,6 +43,7 @@ var respondMovies = function (req, res, next) {
 
 //[GET]
 var respondActors = function (req, res, next) {
+    req.accepts(mType);
     res.contentType = 'application/json';
     res.status(200);
     res.send({actors: 'world'});
@@ -36,12 +51,31 @@ var respondActors = function (req, res, next) {
 
 //* RESPOND NOT FOUND
 var respondNotFound = function (req, res, next) {
+    req.accepts(mType);
     res.contentType = 'text/plain';
     res.status(404);
     res.send('invalid url requested');
 }
 
-var server = restify.createServer();
+//declare server
+var server = restify.createServer({
+
+    //add formatter
+    formatters: {
+        'application/vnd.collection+json; q=0.9': function formatCJ(req, res, body) {
+            if (body instanceof Error)
+                return body.stack;
+
+            if (Buffer.isBuffer(body))
+                return body.toString('base64');
+
+            var data = JSON.stringify(body);
+            res.setHeader('Content-Length', Buffer.byteLength(data));
+            return util.inspect(body);
+        }
+    }
+});
+
 
 //routes
 server.get('/', respondDefault);
@@ -57,3 +91,20 @@ server.name = 'node_restify';
 server.listen(env_port, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
+
+
+// sample collection object
+/*
+ {
+ "collection" :
+ {
+ "version" : "1.0",
+ "href" : URI,
+ "links" : [ARRAY],
+ "items" : [ARRAY],
+ "queries" : [ARRAY],
+ "template" : {OBJECT},
+ "error" : {OBJECT}
+ }
+ }
+ */
