@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "restify": "~2.6.1",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "bunyan": "~0.22.1"
   }
 }
