@@ -7,6 +7,7 @@ var path = '';
 var base = '';
 var mType = 'application/vnd.collection+json';
 var cj = {};
+var URI = "http://localhost:3000";
 
 restify.defaultResponseHeaders = false; // disable default headers altogether
 
@@ -14,24 +15,40 @@ var sendInvalidRequestError = function (req, res, next) {
     res.contentType = 'text/plain';
     res.status(401);
     res.send('we only accept content type ' + mType);
-}
+};
+
+var renderCJ = function () {
+    cj = {
+        "collection":
+        {
+            "version":"0.1",
+            "href":URI,
+            "links":[
+                URI + "/movies",
+                URI + "/actors"
+            ],
+            "items":[],
+            "queries":[],
+            "template":{},
+            "error":{}
+        }
+    };
+};
 
 //[GET, HEAD]
 var respondDefault = function (req, res, next) {
     if (req.accepts(mType)) {
-        if (req.is(mType)) {
-            res.contentType = mType;
-            res.status(200);
-            res.send('accepted ' + mType);
-        } else {
-            res.contentType = 'text/plain';
-            res.status(407);
-            res.send('we only accept content type ' + mType);
-        }
+        renderCJ();
+        var body = JSON.stringify(cj, null, '\t');
+        res.writeHead(200, {
+            'Content-Length': Buffer.byteLength(body),
+            'Content-Type': mType
+        });
+        res.end(body);
     } else {
         sendInvalidRequestError(req, res, next);
     }
-}
+};
 
 //[GET]
 var respondMovies = function (req, res, next) {
@@ -39,7 +56,7 @@ var respondMovies = function (req, res, next) {
     res.contentType = 'application/json';
     res.status(200);
     res.send({movie: 'world'});
-}
+};
 
 //[GET]
 var respondActors = function (req, res, next) {
@@ -47,7 +64,7 @@ var respondActors = function (req, res, next) {
     res.contentType = 'application/json';
     res.status(200);
     res.send({actors: 'world'});
-}
+};
 
 //* RESPOND NOT FOUND
 var respondNotFound = function (req, res, next) {
@@ -55,7 +72,7 @@ var respondNotFound = function (req, res, next) {
     res.contentType = 'text/plain';
     res.status(404);
     res.send('invalid url requested');
-}
+};
 
 //declare server
 var server = restify.createServer({
