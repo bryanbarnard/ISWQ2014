@@ -1,163 +1,222 @@
-//entry point
-var util = require('util')
-var restify = require('../node_modules/restify');
-var items = require('./data.js').friends;
-var bunyan = require('../node_modules/bunyan');
-var env_port = 3000;
+var http = require('http');
+var url = require('url');
+var crypto = require('crypto');
+var querystring = require('querystring');
+var port = (process.env.PORT || 1337);
+var root = '';
 var path = '';
 var base = '';
-var mType = 'application/vnd.collection+json';
-var cj = {};
-var URI = "http://localhost:3000";
+var contentType = 'application/vnd.collection+json';
+var responseCj = {};
+var responseBody = '';
+var responseHeaders = null;
+var responseStatus = null;
+var requestBody = null;
+var reAPIBillboard = new RegExp('^\/api\/$','i');
+var reAPIListMovies = new RegExp('^\/api\/movies$','i');
+var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
+var items = require('./data.js').friends;
 
-restify.defaultResponseHeaders = false; // disable default headers altogether
+var handler = function (req, res) {
 
+    var flg = false;
+    root = 'http://' + req.headers.host;
+    path = url.parse(req.url).pathname;
 
-var sendInvalidRequestError = function (req, res, next) {
-    res.contentType = 'text/plain';
-    res.status(401);
-    res.send('we only accept content type ' + mType);
-    next();
-};
+    //capture request body
+    requestBody = '';
+    req.on('data', function (chunk) {
+        requestBody += chunk;
+    });
 
-var renderCJ = function () {
-    cj = {
-        "collection":
-        {
-            "version":"0.1",
-            "href":URI,
-            "links":[
-                URI + "/movies",
-                URI + "/actors"
-            ],
-            "items":[],
-            "queries":[],
-            "template":{},
-            "error":{}
-        }
-    };
-};
+    //branch billboard
+    if (reAPIBillboard.test(req.url)) {
+        flg = true;
+        console.log('reAPIBillboard true');
 
-//[GET, HEAD]
-var respondDefault = function (req, res, next) {
-    if (req.accepts(mType)) {
-        renderCJ();
-        var body = cj;
-
-        res.contentType = mType;
-        res.status(200);
-        res.send(body);
-        next();
-
-        /*
-        res.writeHead(200, {
-            'Content-Length': Buffer.byteLength(body),
-            'Content-Type': mType
-        });
-        res.end(body);
-        */
-    } else {
-        sendInvalidRequestError(req, res, next);
-        next();
-    }
-};
-
-//[GET]
-var respondMovies = function (req, res, next) {
-    if (req.accepts(mType)) {
-        renderCJ();
-        var body = JSON.stringify(cj, null, '\t');
-
-        res.contentType = mType;
-        res.status(200);
-        res.send(body);
-        next();
-    } else {
-        sendInvalidRequestError(req, res, next);
-        next();
-    }
-};
-
-//[GET]
-var respondActors = function (req, res, next) {
-    if (req.accepts(mType)) {
-        renderCJ();
-        var body = JSON.stringify(cj, null, '\t');
-
-        res.contentType = mType;
-        res.status(200);
-        res.send(body);
-        next();
-    } else {
-        sendInvalidRequestError(req, res, next);
-        next();
-    }
-};
-
-//* RESPOND NOT FOUND
-var respondNotFound = function (req, res, next) {
-    req.accepts(mType);
-    res.contentType = 'text/plain';
-    res.status(404);
-    res.send('invalid url requested');
-    next();
-};
-
-//declare server
-var server = restify.createServer({
-    formatters: {
-        'application/vnd.collection+json; q=0.9': function formatCJ(req, res, body) {
-            if (body instanceof Error) {
-                res.statusCode = body.statusCode || 500;
-            }
-
-            if (Buffer.isBuffer(body)) {
-                return body.toString('base64');
-            }
-
-            var data = JSON.stringify(body, null, '\t');
-            res.setHeader('Content-Length', Buffer.byteLength(data));
-            return (data);
+        switch(req.method) {
+            case 'GET':
+                sendBillboardResponse(req, res);
+                break;
+            default:
+                break;
         }
     }
-});
 
-//routes
-server.get({path: '/', version: '0.0.0', name: 'billboard'}, respondDefault);
-server.head('/', respondDefault);
-server.get('/movies', respondMovies) ;
-server.get('/actors', respondActors);
+    //branch movies
+    if (flg === false && reAPIListMovies.test(req.url)) {
+        flg = true;
+        console.log('reAPIListMovies true');
 
-//event handlers
-server.on('NotFound', respondNotFound);
+        switch(req.method) {
+            case 'GET':
+                sendListResponseMovies(req, res);
+                break;
+            case 'POST':
+                break;
+            case 'DELETE':
+                sendDeleteResponse(req, res);
+                break;
+            default:
+                break;
+        }
+    }
 
-server.on('after', restify.auditLogger({
-    log: bunyan.createLogger({
-        name: 'audit',
-        stream: process.stdout
-    })
-}));
+    //branch movie
+    if (flg === false && reAPIItemMovies.test(req.url)) {
+        flg = true;
+        console.log('reAPIItemMovies true');
 
-//server properties
-server.name = 'node_restify';
+        switch(req.method) {
+            case 'GET':
+                sendItemResponseMovies(req, res);
+                break;
+            case 'POST':
+                //sendNotAcceptedResponse
+                break;
+            case 'DELETE':
+                sendDeleteResponse(req, res);
+                break;
+            default:
+                break;
+        }
+    }
 
-//start server
-server.listen(env_port, function() {
-    console.log('%s listening at %s', server.name, server.url);
-});
 
-// sample collection object
+    //not found
+    if (flg === false) {
+        console.log('send not found');
+        sendNotFoundResponse(req, res);
+    }
+};
+
+var sendBillboardResponse = function (req, res) {
+    req.on('end', function () {
+        //build response
+        responseBody = JSON.stringify(responseCj);
+        responseHeaders = {
+            'Content-Type': contentType,
+            'Content-Length': Buffer.byteLength(responseBody)
+        }
+        responseStatus = 200;
+
+        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+    });
+};
+
+
+var sendDeleteResponse = function (req, res) {
+    responseBody = '';
+    responseHeaders = {};
+    responseStatus = 204;
+    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+};
+
+var sendNotFoundResponse = function (req, res) {
+    responseBody = '';
+    responseHeaders = {};
+    responseStatus = 404;
+    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+};
+
+var sendListResponseMovies = function (req, res) {
+    req.on('end', function () {
+        //build response
+        responseBody = JSON.stringify(responseCj);
+        responseHeaders = {
+            'Content-Type': contentType,
+            'Content-Length': Buffer.byteLength(responseBody)
+        }
+        responseStatus = 200;
+
+        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+    });
+};
+
+var sendItemResponseMovies = function (req, res) {
+    req.on('end', function () {
+        //build response
+        responseBody = JSON.stringify(responseCj);
+        responseHeaders = {
+            'Content-Type': contentType,
+            'Content-Length': Buffer.byteLength(responseBody)
+        }
+        responseStatus = 200;
+
+        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+    });
+};
+
+var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
+    res.writeHead(responseStatus, responseHeaders);
+    res.end(responseBody);
+};
+
+
+//main
+http.createServer(handler).listen(port);
+
+
+
+var cjTemplate = {
+    "collection":
+    {
+        "version":"0.1",
+        "href":URI,
+        "links":[
+            URI + "/movies",
+            URI + "/actors"
+        ],
+        "items":[],
+        "queries":[],
+        "template":{},
+        "error":{}
+    }
+};
+
 /*
- {
- "collection" :
- {
- "version" : "1.0",
- "href" : URI,
- "links" : [ARRAY],
- "items" : [ARRAY],
- "queries" : [ARRAY],
- "template" : {OBJECT},
- "error" : {OBJECT}
+ var server = http.createServer(function(request, response) {
+ var body = '';
+
+ request.on('data', function (chunk) {
+ body += chunk;
+ });
+
+ request.on('end', function () {
+ var now = new Date();
+ var msg = '';
+
+ console.log('request received: ' + now.toISOString());
+ console.log('request.method: ' + request.method);
+ console.log('request.url: ' + request.url);
+ console.log('request.httpVersion: ' + request.httpVersion);
+ console.log('request.headers:');
+
+ //log headers
+ for (var header in request.headers) {
+ console.log('  ' + header + ': ' + request.headers[header]);
  }
+
+ console.log('request.body:');
+ //console.log('  ' + body);
+
+ try {
+ msg = JSON.parse(body);
+ console.log(JSON.stringify(msg, null, 4)); //4 is the spacer arg
  }
+ catch(ex) {
+ console.log('error parsing body as JSON');
+ }
+
+ console.log(); //insert line break
+ response.writeHead(200);
+ response.end();
+ });
+ }).listen(port, 'localhost');
+ console.log('server listening at http://localhost:8080');
  */
+
+/**
+ * Sample Requests
+ */
+//curl -X POST -v -H "Content-Type: application/vnd.collection+json" -H "Connection: close" -H "Cache-Control: no-cache" -d '{"template":{"data":[{"name":"text","value":"testing"},{"name":"junk","value":""}]}}' http://localhost:8080/api/
