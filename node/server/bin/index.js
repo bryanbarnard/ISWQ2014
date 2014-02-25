@@ -4,7 +4,9 @@ var url = require('url');
 var crypto = require('crypto');
 var querystring = require('querystring');
 var movieCollection = require('./movie_collection.json');
-var items = require('./data.js').friends;
+var movieItem = require('./movie_item.json');
+//var items = require('./data.js').friends;
+var billboardResponse = require('./billboard.json');
 
 
 //variables
@@ -25,7 +27,7 @@ var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 var handler = function (req, res) {
 
     //simple content negotiation
-    if (req.headers.accept && req.headers.accept.contains('application/vnd.collection+json')) {
+    if (req.headers.accept && req.headers.accept.indexOf('application/vnd.collection+json') != -1) {
         contentType = 'application/vnd.collection+json';
     } else {
         contentType = 'application/json';
@@ -105,6 +107,8 @@ var handler = function (req, res) {
 var sendBillboardResponse = function (req, res) {
     req.on('end', function () {
         //build response
+
+        responseCj = billboardResponse;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,
@@ -134,6 +138,8 @@ var sendNotFoundResponse = function (req, res) {
 var sendListResponseMovies = function (req, res) {
     req.on('end', function () {
         //build response
+
+        responseCj = movieCollection;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,
@@ -148,6 +154,8 @@ var sendListResponseMovies = function (req, res) {
 var sendItemResponseMovies = function (req, res) {
     req.on('end', function () {
         //build response
+
+        responseCj = movieItem;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,

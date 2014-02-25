@@ -1,0 +1,1 @@
+{"collection":{"version":"1.0","href":"http://localhost:1337/api/","links":[{"href":"http://localhost:1337/movie-alps.xml","rel":"profile"},{"href":"http://localhost:1337/api/movies","rel":"items"}]}}

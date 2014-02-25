@@ -1,1 +1,172 @@
-{"collection":{"version":"1.0","links":[{"href":"http://localhost:1337/movie-alps.xml","rel":"profile"}],"href":"http://localhost:1337/api/","items":[{"href":"http://localhost:1337/api/613856331910938","data":[{"name":"description","value":"An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.","prompt":"description of movie"},{"name":"datePublished","value":"2013-03-28T21:51:08.406Z","prompt":"date movie was published"},{"name":"name","value":"Caddyshack","prompt":"title of the movie"},{"name":"about","value":"An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.","prompt":"short description of this item"},{"name":"genre","value":"comedy","prompt":"movie genre"},{"name":"version","value":1,"":"version of this release"},{"name":"timeRequired","value":"PT180M","prompt":"time required to view this movie also known as duration"},{"name":"contentRating","value":5,"prompt":"rating of the movie (1-5)"}],"links":[{"name":"director","rel":"director","prompt":"the director of the movie","href":"/contacts/abcdefghijk","render":"link"}]}],"template":{"data":[{"name":"description","value":"","prompt":"description of movie"},{"name":"datePublished","value":"","prompt":"date movie was published"},{"name":"name","value":"","prompt":"title of the movie"},{"name":"about","value":"","prompt":"short description of this item"},{"name":"genre","value":"","prompt":"movie genre"},{"name":"version","value":"","prompt":"version of this release"},{"name":"timeRequired","value":"","prompt":"time required to view this movie also known as duration"},{"name":"contentRating","value":"","prompt":"rating of the movie (1-5)"}]}}}
+{
+    "collection": {
+        "version": "1.0",
+        "href": "http://localhost:1337/api/movies",
+        "items": [
+            {
+                "href": "http://localhost:1337/api/movies/613856331910938",
+                "data": [
+                    {
+                        "name": "description",
+                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.",
+                        "prompt": "description of movie"
+                    },
+                    {
+                        "name": "datePublished",
+                        "value": "2013-03-28T21:51:08.406Z",
+                        "prompt": "date movie was published"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Caddyshack",
+                        "prompt": "title of the movie"
+                    },
+                    {
+                        "name": "about",
+                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.",
+                        "prompt": "short description of this item"
+                    },
+                    {
+                        "name": "genre",
+                        "value": "comedy",
+                        "prompt": "movie genre"
+                    },
+                    {
+                        "name": "version",
+                        "value": 1,
+                        "": "version of this release"
+                    },
+                    {
+                        "name": "timeRequired",
+                        "value": "PT180M",
+                        "prompt": "time required to view this movie also known as duration"
+                    },
+                    {
+                        "name": "contentRating",
+                        "value": 5,
+                        "prompt": "rating of the movie (1-5)"
+                    }
+                ],
+                "links": [
+                    {
+                        "name": "director",
+                        "rel": "director",
+                        "prompt": "the director of the movie",
+                        "href": "/contacts/abcdefghijk",
+                        "render": "l    ink"
+                    }
+                ]
+            },
+            {
+                "href": "http://localhost:1337/api/movies/613856331910937",
+                "data": [
+                    {
+                        "name": "description",
+                        "value": "Ghosts arrive in Manhattan. Who you gonna call?",
+                        "prompt": "description of movie"
+                    },
+                    {
+                        "name": "datePublished",
+                        "value": "2013-03-24T21:51:08.406Z",
+                        "prompt": "date movie was published"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Ghostbusters",
+                        "prompt": "title of the movie"
+                    },
+                    {
+                        "name": "about",
+                        "value": "Ghosts arrive in Manhattan. Who you gonna call?",
+                        "prompt": "short description of this item"
+                    },
+                    {
+                        "name": "genre",
+                        "value": "comedy",
+                        "prompt": "movie genre"
+                    },
+                    {
+                        "name": "version",
+                        "value": 1,
+                        "": "version of this release"
+                    },
+                    {
+                        "name": "timeRequired",
+                        "value": "PT190M",
+                        "prompt": "time required to view this movie also known as duration"
+                    },
+                    {
+                        "name": "contentRating",
+                        "value": 4,
+                        "prompt": "rating of the movie (1-5)"
+                    }
+                ],
+                "links": [
+                    {
+                        "name": "director",
+                        "rel": "director",
+                        "prompt": "the director of the movie",
+                        "href": "/contacts/abcdefghijk",
+                        "render": "link"
+                    }
+                ]
+            }
+        ],
+        "queries": [],
+        "links": [
+            {
+                "href": "http://localhost:1337/movie-alps.xml",
+                "rel": "profile"
+            }
+        ],
+        "template": {
+            "data": [
+                {
+                    "name": "description",
+                    "value": "",
+                    "prompt": "description of mo    vie"
+                },
+                {
+                    "name": "datePublished",
+                    "value": "",
+                    "prompt": "date movie was published"
+                },
+                {
+                    "name": "name",
+                    "value": "",
+                    "prompt": "title of the movie"
+                },
+                {
+                    "name": "about",
+                    "value": "",
+                    "prompt": "short description of this item"
+                },
+                {
+                    "name": "genre",
+                    "value": "",
+                    "prompt": "movie genre"
+                },
+                {
+                    "name": "version",
+                    "value": "",
+                    "prompt": "version of this release"
+                },
+                {
+                    "name": "timeRequired",
+                    "value": "",
+                    "prompt": "time required to view this movie also known as duration"
+                },
+                {
+                    "name": "contentRating",
+                    "value": "",
+                    "prompt": "rating of the movie (1-5)"
+                }
+            ]
+        },
+        "error": {
+            "title": "''",
+            "code": "''",
+            "message": "''"
+        }
+    }
+}
