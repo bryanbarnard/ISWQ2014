@@ -16,6 +16,7 @@
   "dependencies": {
     "restify": "~2.6.1",
     "underscore": "~1.5.2",
-    "bunyan": "~0.22.1"
+    "bunyan": "~0.22.1",
+    "node-uuid": "^1.4.1"
   }
 }

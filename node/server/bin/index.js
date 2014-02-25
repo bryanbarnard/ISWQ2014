@@ -2,12 +2,12 @@
 var http = require('http');
 var url = require('url');
 var crypto = require('crypto');
+var uuid = require('node-uuid');
 var querystring = require('querystring');
 var movieCollection = require('./movie_collection.json');
 var movieItem = require('./movie_item.json');
 //var items = require('./data.js').friends;
 var billboardResponse = require('./billboard.json');
-
 
 //variables
 var port = (process.env.PORT || 1337);
@@ -67,6 +67,7 @@ var handler = function (req, res) {
                 sendListResponseMovies(req, res);
                 break;
             case 'POST':
+                sendAddMovieResponse(req, res);
                 break;
             case 'DELETE':
                 sendDeleteResponse(req, res);
@@ -87,6 +88,8 @@ var handler = function (req, res) {
                 break;
             case 'POST':
                 //sendNotAcceptedResponse
+            case 'PUT':
+                //sendItemUpdateResponseMovies(req, res);
                 break;
             case 'DELETE':
                 sendDeleteResponse(req, res);
@@ -102,6 +105,27 @@ var handler = function (req, res) {
         console.log('send not found');
         sendNotFoundResponse(req, res);
     }
+};
+
+var sendAddMovieResponse = function (req, res) {
+    req.on('end', function () {
+
+        //TODO: add validation and add functionality
+
+
+        //build response
+        var id = uuid();
+        id = id.replace(/-/g,'');
+
+        //responseCj = billboardResponse;
+        responseBody = '';
+        responseHeaders = {
+            'Location': base + 'movies/' + id
+        }
+        responseStatus = 201;
+
+        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+    });
 };
 
 var sendBillboardResponse = function (req, res) {
@@ -175,8 +199,6 @@ var sendResponse = function (req, res, responseStatus, responseHeaders, response
 
 //main
 http.createServer(handler).listen(port);
-
-
 
 var cjTemplate = {
     "collection":
