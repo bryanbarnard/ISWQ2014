@@ -1,12 +1,18 @@
+//imports
 var http = require('http');
 var url = require('url');
 var crypto = require('crypto');
 var querystring = require('querystring');
+var movieCollection = require('./movie_collection.json');
+var items = require('./data.js').friends;
+
+
+//variables
 var port = (process.env.PORT || 1337);
 var root = '';
 var path = '';
-var base = '';
-var contentType = 'application/vnd.collection+json';
+var base = 'http://localhost:1337/api/';
+var contentType = ''
 var responseCj = {};
 var responseBody = '';
 var responseHeaders = null;
@@ -15,9 +21,15 @@ var requestBody = null;
 var reAPIBillboard = new RegExp('^\/api\/$','i');
 var reAPIListMovies = new RegExp('^\/api\/movies$','i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
-var items = require('./data.js').friends;
 
 var handler = function (req, res) {
+
+    //simple content negotiation
+    if (req.headers.accept && req.headers.accept.contains('application/vnd.collection+json')) {
+        contentType = 'application/vnd.collection+json';
+    } else {
+        contentType = 'application/json';
+    }
 
     var flg = false;
     root = 'http://' + req.headers.host;
@@ -162,10 +174,10 @@ var cjTemplate = {
     "collection":
     {
         "version":"0.1",
-        "href":URI,
+        "href": base,
         "links":[
-            URI + "/movies",
-            URI + "/actors"
+            base + "/movies",
+            base + "/actors"
         ],
         "items":[],
         "queries":[],
