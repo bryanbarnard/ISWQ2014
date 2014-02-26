@@ -6,7 +6,6 @@ var uuid = require('node-uuid');
 var querystring = require('querystring');
 var movieCollection = require('./movie_collection.json');
 var movieItem = require('./movie_item.json');
-//var items = require('./data.js').friends;
 var billboardResponse = require('./billboard.json');
 
 //variables
