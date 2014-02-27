@@ -1,4 +1,5 @@
 //imports
+
 var http = require('http');
 var url = require('url');
 var crypto = require('crypto');
@@ -52,11 +53,41 @@ mongoose.connection.once('open', function callback () {
 
 // Bootstrap models
 fs.readdirSync('../models').forEach(function (file) {
-    if (~file.indexOf('.js')) require('../models/' + file)
-})
+    if (~file.indexOf('.js')) {
+      require('../models/' + file);
+    }
+});
 
 
-// Routes
+/**
+ * Lets Run Some Tests with Mongoose
+ */
+
+// create and save movie
+var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
+console.log('instance.name: ' + instance.name);
+
+/*
+instance.save(function (err, instance) {
+    if (err) {
+        return console.error(err);
+    }
+    console.log('instance.name: ' + instance.name + ' saved');
+});
+*/
+
+// lets run a query
+mongoose.models.Movie.find(function (err, movies) {
+    if (err) {
+        return console.error(err);
+    }
+    console.log(movies);
+});
+
+
+/**
+ * Route Patterns
+ */
 var reAPIBillboard = new RegExp('^\/api\/$','i');
 var reAPIListMovies = new RegExp('^\/api\/movies$','i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
@@ -68,7 +99,7 @@ var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
  */
 var handler = function (req, res) {
 
-    //simple content negotiation
+    //some simple content negotiation
     if (req.headers.accept && req.headers.accept.indexOf('application/vnd.collection+json') != -1) {
         contentType = 'application/vnd.collection+json';
     } else {
