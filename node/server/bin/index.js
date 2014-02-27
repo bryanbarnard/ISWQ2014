@@ -7,22 +7,65 @@ var querystring = require('querystring');
 var movieCollection = require('./movie_collection.json');
 var movieItem = require('./movie_item.json');
 var billboardResponse = require('./billboard.json');
+var mongoose = require('mongoose');
+var fs = require('fs');
 
 //variables
 var port = (process.env.PORT || 1337);
 var root = '';
 var path = '';
 var base = 'http://localhost:1337/api/';
-var contentType = ''
+var contentType = '';
 var responseCj = {};
 var responseBody = '';
 var responseHeaders = null;
 var responseStatus = null;
 var requestBody = null;
+
+
+/**
+ * Setup DB Connection
+ */
+
+// Connect to mongodb
+var connect = function () {
+    var options = { server: { socketOptions: { keepAlive: 1 } } }
+    mongoose.connect('mongodb://localhost/api', options)
+}
+connect();
+
+// Error handler
+mongoose.connection.on('error', function (err) {
+    console.log(err)
+});
+
+// Reconnect when closed
+mongoose.connection.on('disconnected', function () {
+    connect()
+});
+
+// On Connection
+mongoose.connection.once('open', function callback () {
+    console.log('connected successfully');
+});
+
+
+// Bootstrap models
+fs.readdirSync('../models').forEach(function (file) {
+    if (~file.indexOf('.js')) require('../models/' + file)
+})
+
+
+// Routes
 var reAPIBillboard = new RegExp('^\/api\/$','i');
 var reAPIListMovies = new RegExp('^\/api\/movies$','i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 
+/**
+ * Handle incoming requests
+ * @param req
+ * @param res
+ */
 var handler = function (req, res) {
 
     //simple content negotiation
