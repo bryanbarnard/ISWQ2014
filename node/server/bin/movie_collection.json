@@ -8,53 +8,60 @@
                 "data": [
                     {
                         "name": "description",
-                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.",
-                        "prompt": "description of movie"
+                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher."
                     },
                     {
                         "name": "datePublished",
-                        "value": "2013-03-28T21:51:08.406Z",
-                        "prompt": "date movie was published"
+                        "value": "2013-03-28T21:51:08.406Z"
                     },
                     {
                         "name": "name",
-                        "value": "Caddyshack",
-                        "prompt": "title of the movie"
+                        "value": "Caddyshack"
                     },
                     {
                         "name": "about",
-                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.",
-                        "prompt": "short description of this item"
+                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher."
                     },
                     {
                         "name": "genre",
-                        "value": "comedy",
-                        "prompt": "movie genre"
+                        "value": "comedy"
                     },
                     {
                         "name": "version",
-                        "value": 1,
-                        "": "version of this release"
+                        "value": 1
                     },
                     {
                         "name": "timeRequired",
-                        "value": "PT180M",
-                        "prompt": "time required to view this movie also known as duration"
+                        "value": "PT180M"
                     },
                     {
                         "name": "contentRating",
-                        "value": 5,
-                        "prompt": "rating of the movie (1-5)"
+                        "value": 5
                     }
                 ],
                 "links": [
                     {
-                        "name": "director",
+                        "name": "Martin Scorcese",
                         "rel": "director",
-                        "prompt": "the director of the movie",
-                        "href": "/contacts/abcdefghijk",
-                        "render": "l    ink"
+                        "prompt": "movie director",
+                        "href": "http://localhost:1337/persons/abcdefghijk",
+                        "render": "link"
+                    },
+                    {
+                        "name": "Brad Pitt",
+                        "rel": "actor",
+                        "prompt": "movie actor",
+                        "href": "http://localhost:1337/persons/abcdefghij2",
+                        "render": "link"
+                    },
+                    {
+                        "name": "Will Smith",
+                        "rel": "actor",
+                        "prompt": "movie actor",
+                        "href": "http://localhost:1337/persons/abcdefghij7",
+                        "render": "link"
                     }
+
                 ]
             },
             {
@@ -62,43 +69,35 @@
                 "data": [
                     {
                         "name": "description",
-                        "value": "Ghosts arrive in Manhattan. Who you gonna call?",
-                        "prompt": "description of movie"
+                        "value": "Ghosts arrive in Manhattan. Who you gonna call?"
                     },
                     {
                         "name": "datePublished",
-                        "value": "2013-03-24T21:51:08.406Z",
-                        "prompt": "date movie was published"
+                        "value": "2013-03-24T21:51:08.406Z"
                     },
                     {
                         "name": "name",
-                        "value": "Ghostbusters",
-                        "prompt": "title of the movie"
+                        "value": "Ghostbusters"
                     },
                     {
                         "name": "about",
-                        "value": "Ghosts arrive in Manhattan. Who you gonna call?",
-                        "prompt": "short description of this item"
+                        "value": "Ghosts arrive in Manhattan. Who you gonna call?"
                     },
                     {
                         "name": "genre",
-                        "value": "comedy",
-                        "prompt": "movie genre"
+                        "value": "comedy"
                     },
                     {
                         "name": "version",
-                        "value": 1,
-                        "": "version of this release"
+                        "value": 1
                     },
                     {
                         "name": "timeRequired",
-                        "value": "PT190M",
-                        "prompt": "time required to view this movie also known as duration"
+                        "value": "PT190M"
                     },
                     {
                         "name": "contentRating",
-                        "value": 4,
-                        "prompt": "rating of the movie (1-5)"
+                        "value": 4
                     }
                 ],
                 "links": [
@@ -106,7 +105,7 @@
                         "name": "director",
                         "rel": "director",
                         "prompt": "the director of the movie",
-                        "href": "/contacts/abcdefghijk",
+                        "href": "/persons/abcdefghijk",
                         "render": "link"
                     }
                 ]
@@ -117,6 +116,14 @@
             {
                 "href": "http://localhost:1337/movie-alps.xml",
                 "rel": "profile"
+            },
+            {
+                "href": "http://localhost:1337/api/movies/",
+                "rel": "movies"
+            },
+            {
+                "href": "http://localhost:1337/api/persons/",
+                "rel": "persons"
             }
         ],
         "template": {
@@ -124,42 +131,50 @@
                 {
                     "name": "description",
                     "value": "",
-                    "prompt": "description of mo    vie"
+                    "prompt": "description of movie",
+                    "required": "true"
                 },
                 {
                     "name": "datePublished",
                     "value": "",
-                    "prompt": "date movie was published"
+                    "prompt": "date movie was published",
+                    "required": "true"
                 },
                 {
                     "name": "name",
                     "value": "",
-                    "prompt": "title of the movie"
+                    "prompt": "title of the movie",
+                    "required": "true"
                 },
                 {
                     "name": "about",
                     "value": "",
-                    "prompt": "short description of this item"
+                    "prompt": "short description of this item",
+                    "required": "true"
                 },
                 {
                     "name": "genre",
                     "value": "",
-                    "prompt": "movie genre"
+                    "prompt": "movie genre",
+                    "required": "true"
                 },
                 {
                     "name": "version",
                     "value": "",
-                    "prompt": "version of this release"
+                    "prompt": "version of this release",
+                    "required": "true"
                 },
                 {
                     "name": "timeRequired",
                     "value": "",
-                    "prompt": "time required to view this movie also known as duration"
+                    "prompt": "time required to view this movie also known as duration",
+                    "required": "true"
                 },
                 {
                     "name": "contentRating",
                     "value": "",
-                    "prompt": "rating of the movie (1-5)"
+                    "prompt": "rating of the movie (1-5)",
+                    "required": "true"
                 }
             ]
         },
