@@ -10,6 +10,7 @@ var movieItem = require('./movie_item.json');
 var billboardResponse = require('./billboard.json');
 var mongoose = require('mongoose');
 var fs = require('fs');
+var bunyan = require('bunyan');
 
 //variables
 var port = (process.env.PORT || 1337);
@@ -22,6 +23,7 @@ var responseBody = '';
 var responseHeaders = null;
 var responseStatus = null;
 var requestBody = null;
+var log = bunyan.createLogger({name: "api"});
 
 
 /**
@@ -37,7 +39,7 @@ connect();
 
 // Error handler
 mongoose.connection.on('error', function (err) {
-    console.log(err)
+    log.info(err)
 });
 
 // Reconnect when closed
@@ -47,7 +49,7 @@ mongoose.connection.on('disconnected', function () {
 
 // On Connection
 mongoose.connection.once('open', function callback () {
-    console.log('connected successfully');
+    log.info('mongod connected successfully');
 });
 
 
@@ -65,7 +67,7 @@ fs.readdirSync('../models').forEach(function (file) {
 
 // create and save movie
 var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
-console.log('instance.name: ' + instance.name);
+log.info('instance.name: ' + instance.name);
 
 /*
 instance.save(function (err, instance) {
@@ -81,7 +83,12 @@ mongoose.models.Movie.find(function (err, movies) {
     if (err) {
         return console.error(err);
     }
-    console.log(movies);
+
+    if (movies && movies.length > 0) {
+        for (var i = 0; i < movies.length; i++) {
+            log.info({movie: movies[i]});
+        }
+    }
 });
 
 
