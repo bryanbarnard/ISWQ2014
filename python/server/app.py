@@ -1,5 +1,5 @@
 from bottle import Bottle, run, route, abort, redirect, request, response
-from json import dumps
+import json
 
 # application
 app = Bottle()
@@ -21,7 +21,12 @@ def billboard_route():
         response.set_header('Content-Type', 'application/vnd.collection+json')
     else:
         response.set_header('Content-Type', 'application/json')
-    return "billboard"
+
+    with open('billboard.json') as json_data:
+        d = json.load(json_data)
+        json_data.close()
+
+    return d
 
 # main
-run(app, host='localhost', port=8080, debug=True)
+run(app, host='localhost', port=1337, debug=True)
