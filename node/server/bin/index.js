@@ -123,7 +123,7 @@ var handler = function (req, res) {
         requestBody += chunk;
     });
 
-    //branch billboard
+    //billboard route - RegExp('^\/api\/$','i')
     if (reAPIBillboard.test(req.url)) {
         flg = true;
         console.log('reAPIBillboard true');
@@ -137,7 +137,7 @@ var handler = function (req, res) {
         }
     }
 
-    //branch movies
+    //movies collection route - RegExp('^\/api\/movies$','i')
     if (flg === false && reAPIListMovies.test(req.url)) {
         flg = true;
         console.log('reAPIListMovies true');
@@ -157,7 +157,7 @@ var handler = function (req, res) {
         }
     }
 
-    //branch movie
+    //movie item route - RegExp('^\/api\/movies\/.*','i')
     if (flg === false && reAPIItemMovies.test(req.url)) {
         flg = true;
         console.log('reAPIItemMovies true');
