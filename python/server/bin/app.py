@@ -1,9 +1,10 @@
-from bottle import default_app, abort, response, request, run
 import json
+from bottle import *
+from mongoengine import *
+from movie import *
 
 # application
 app = default_app();
-
 app.config['autojson'] = False
 
 
@@ -14,6 +15,7 @@ def determine_response_content_type(acceptHeader):
     else:
         return 'application/json'
 
+
 # routes
 # default
 @app.route('/')
@@ -23,6 +25,12 @@ def callback():
 # billboard route - '^\/api$'
 @app.route('/api')
 def callback():
+
+    # connect mongo and iterate movies
+    connect('api')
+    for movie in Movie.objects:
+        print movie.name
+
 
     # check accepts and content type
     # content_type = request.headers.get('Content-Type')
@@ -63,10 +71,6 @@ def callback(id):
         response_body = json.load(json_data)
         json_data.close()
     return json.dumps(response_body)
-
-
-
-
 
 
 # main
