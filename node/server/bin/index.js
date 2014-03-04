@@ -5,9 +5,9 @@ var url = require('url');
 var crypto = require('crypto');
 var uuid = require('node-uuid');
 var querystring = require('querystring');
-var movieCollection = require('./movie_collection.json');
-var movieItem = require('./movie_item.json');
-var billboardResponse = require('./billboard.json');
+var movieCollectionStatic = require('./movie_collection.json');
+var movieItemStatic = require('./movie_item.json');
+var billboardResponseStatic = require('./billboard.json');
 var mongoose = require('mongoose');
 var fs = require('fs');
 var bunyan = require('bunyan');
@@ -16,7 +16,7 @@ var bunyan = require('bunyan');
 var port = (process.env.PORT || 1337);
 var root = '';
 var path = '';
-var base = 'http://localhost:1337/api/';
+var base = '/';
 var contentType = '';
 var responseCj = {};
 var responseBody = '';
@@ -100,12 +100,27 @@ var reAPIListMovies = new RegExp('^\/api\/movies$','i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 
 /**
+ * Create Collection JSON Response Template
+ */
+var createResponseCjTemplate = function() {
+    responseCj.collection = {};
+    responseCj.version = "1.0";
+    responseCj.href = base + path;
+
+    responseCj.links = [];
+    responseCj.links.push({'rel': 'home', 'href': base});
+
+    responseCj.items = [];
+    responseCj.queries = [];
+    responseCj.template = {};
+};
+
+/**
  * Handle incoming requests
  * @param req
  * @param res
  */
 var handler = function (req, res) {
-
     //some simple content negotiation
     if (req.headers.accept && req.headers.accept.indexOf('application/vnd.collection+json') != -1) {
         contentType = 'application/vnd.collection+json';
@@ -115,7 +130,9 @@ var handler = function (req, res) {
 
     var flg = false;
     root = 'http://' + req.headers.host;
+    base = 'http://' + req.headers.host;
     path = url.parse(req.url).pathname;
+
 
     //capture request body
     requestBody = '';
@@ -197,7 +214,7 @@ var sendAddMovieResponse = function (req, res) {
         var id = uuid();
         id = id.replace(/-/g,'');
 
-        //responseCj = billboardResponse;
+        //responseCj = billboardResponseStatic;
         responseBody = '';
         responseHeaders = {
             'Location': base + 'movies/' + id
@@ -212,7 +229,7 @@ var sendBillboardResponse = function (req, res) {
     req.on('end', function () {
         //build response
 
-        responseCj = billboardResponse;
+        responseCj = billboardResponseStatic;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,
@@ -239,11 +256,177 @@ var sendNotFoundResponse = function (req, res) {
     sendResponse(req, res, responseStatus, responseHeaders, responseBody);
 };
 
+/**
+ * Render Movie Write Template (POST, PUT)
+ */
+var renderMovieCollectionTemplate = function () {
+    var template = {};
+    var item = {};
+
+    template.data = [];
+
+    item = {};
+    item.name = 'name';
+    item.value = '';
+    item.prompt = 'title of movie';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'description';
+    item.value = '';
+    item.prompt = 'description of movie';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'datePublished';
+    item.value = '';
+    item.prompt = 'date movie was published';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'about';
+    item.value = '';
+    item.prompt = 'short description of film';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'genre';
+    item.value = '';
+    item.prompt = 'movie genre';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'version';
+    item.value = '';
+    item.prompt = 'version of thie release';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'timeRequired';
+    item.value = '';
+    item.prompt = 'time required to view this movie aka duration';
+    item.required = 'true';
+    template.data.push(item);
+
+    item = {};
+    item.name = 'contentRating';
+    item.value = '';
+    item.prompt = 'movie content rating';
+    item.required = 'true';
+    template.data.push(item);
+
+    responseCj.collection.template = template;
+};
+
+/**
+ * Render movie collection queries
+ */
+var renderMovieCollectionQueries = function () {
+    var query = {};
+
+    query = {};
+    query.rel = 'collection sort';
+    query.prompt = 'Sort by Name';
+    query.href = base + '/sortbyname';
+    responseCj.queries.push(query);
+
+};
+
+/**
+ * Render movie collection items
+ */
+var renderMovieCollectionItems = function (coll) {
+
+    var item = {};
+    var dataItem = {};
+
+    id = '613856331910938';
+    item.href = base + '/' + id;
+    item.data = [];
+    item.links = [];
+
+
+    dataItem = {};
+    dataItem.name = 'description';
+    dataItem.value = 'An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.';
+    dataItem.prompt = 'description of movie';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'datePublished'
+    dataItem.value = '2013-03-28T21:51:08.406Z';
+    dataItem.prompt = 'date movie was published';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'name'
+    dataItem.value = 'Caddyshack';
+    dataItem.prompt = 'title of the movie';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'about'
+    dataItem.value = 'An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.';
+    dataItem.prompt = 'short description of this item';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'genre';
+    dataItem.value = 'comedy';
+    dataItem.prompt = 'movie genre';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'version';
+    dataItem.value = '1';
+    dataItem.prompt = 'version of this release';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'timeRequired';
+    dataItem.value = 'PT180M';
+    dataItem.prompt = 'time required to view this movie, aka duration';
+    item.data.push(dataItem);
+
+    dataItem = {};
+    dataItem.name = 'contentRating';
+    dataItem.value = 'R';
+    dataItem.prompt = 'rating of the movie';
+    item.data.push(dataItem);
+
+    linkItem = {};
+    linkItem.name = "harold ramis";
+    linkItem.rel = 'directory';
+    linkItem.prompt = 'director of the movie';
+    linkItem.href = base + path + '/' + id;
+    linkItem.render = 'link';
+    item.links.push(linkItem);
+
+    responseCj.collection.items.push(item);
+
+};
+
 var sendListResponseMovies = function (req, res) {
     req.on('end', function () {
-        //build response
 
-        responseCj = movieCollection;
+        var coll = []; //fix this
+
+        //build response
+        createResponseCjTemplate();
+        renderMovieCollectionTemplate();
+        renderMovieCollectionQueries();
+        renderMovieCollectionItems(coll);
+
+
+
+
+
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,
@@ -259,7 +442,7 @@ var sendItemResponseMovies = function (req, res) {
     req.on('end', function () {
         //build response
 
-        responseCj = movieItem;
+        responseCj = movieItemStatic;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
             'Content-Type': contentType,
