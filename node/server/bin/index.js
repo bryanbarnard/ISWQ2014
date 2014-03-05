@@ -66,9 +66,10 @@ fs.readdirSync('../models').forEach(function (file) {
  */
 
 // create and save movie
+/*
 var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
 log.info('instance.name: ' + instance.name);
-
+*/
 /*
 instance.save(function (err, instance) {
     if (err) {
@@ -79,6 +80,7 @@ instance.save(function (err, instance) {
 */
 
 // lets run a query
+/*
 mongoose.models.Movie.find(function (err, movies) {
     if (err) {
         return console.error(err);
@@ -90,6 +92,7 @@ mongoose.models.Movie.find(function (err, movies) {
         }
     }
 });
+*/
 
 
 /**
@@ -104,15 +107,12 @@ var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
  */
 var createResponseCjTemplate = function() {
     responseCj.collection = {};
-    responseCj.version = "1.0";
-    responseCj.href = base + path;
-
-    responseCj.links = [];
-    responseCj.links.push({'rel': 'home', 'href': base});
-
-    responseCj.items = [];
-    responseCj.queries = [];
-    responseCj.template = {};
+    responseCj.collection.version = "1.0";
+    responseCj.collection.href = base + path;
+    responseCj.collection.links = [];
+    responseCj.collection.items = [];
+    responseCj.collection.queries = [];
+    responseCj.collection.template = {};
 };
 
 /**
@@ -260,6 +260,7 @@ var sendNotFoundResponse = function (req, res) {
  * Render Movie Write Template (POST, PUT)
  */
 var renderMovieCollectionTemplate = function () {
+    console.log('test');
     var template = {};
     var item = {};
 
@@ -333,8 +334,8 @@ var renderMovieCollectionQueries = function () {
     query = {};
     query.rel = 'collection sort';
     query.prompt = 'Sort by Name';
-    query.href = base + '/sortbyname';
-    responseCj.queries.push(query);
+    query.href = base + '/movies/sortbyname';
+    responseCj.collection.queries.push(query);
 
 };
 
@@ -345,6 +346,7 @@ var renderMovieCollectionItems = function (coll) {
 
     var item = {};
     var dataItem = {};
+    responseCj.collection.items = [];
 
     id = '613856331910938';
     item.href = base + '/' + id;
@@ -412,20 +414,35 @@ var renderMovieCollectionItems = function (coll) {
 
 };
 
+/**
+ * Build and render MovieCollection Links
+ */
+var renderMovieCollectionLinks = function () {
+
+    var link = {};
+
+    link = {};
+    link.href = base + path;
+    link.rel = 'home';
+    responseCj.collection.links.push(link);
+
+    link = {};
+    link.href = base + 'movie-alps.xml';
+    link.rel = 'profile';
+    responseCj.collection.links.push(link);
+};
+
 var sendListResponseMovies = function (req, res) {
     req.on('end', function () {
 
-        var coll = []; //fix this
+        var coll = []; //TODO: add mongodb call here to get collection
 
         //build response
         createResponseCjTemplate();
-        renderMovieCollectionTemplate();
-        renderMovieCollectionQueries();
+        renderMovieCollectionLinks();
         renderMovieCollectionItems(coll);
-
-
-
-
+        renderMovieCollectionQueries();
+        renderMovieCollectionTemplate();
 
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
@@ -433,7 +450,6 @@ var sendListResponseMovies = function (req, res) {
             'Content-Length': Buffer.byteLength(responseBody)
         }
         responseStatus = 200;
-
         sendResponse(req, res, responseStatus, responseHeaders, responseBody);
     });
 };
@@ -463,6 +479,7 @@ var sendResponse = function (req, res, responseStatus, responseHeaders, response
 //main
 http.createServer(handler).listen(port);
 
+/*
 var cjTemplate = {
     "collection":
     {
@@ -478,6 +495,7 @@ var cjTemplate = {
         "error":{}
     }
 };
+/*
 
 /*
  var server = http.createServer(function(request, response) {
