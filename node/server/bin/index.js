@@ -66,21 +66,17 @@ fs.readdirSync('../models').forEach(function (file) {
  */
 
 // create and save movie
-/*
 var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
 log.info('instance.name: ' + instance.name);
-*/
-/*
-instance.save(function (err, instance) {
-    if (err) {
-        return console.error(err);
-    }
-    console.log('instance.name: ' + instance.name + ' saved');
-});
-*/
+
+//instance.save(function (err, instance) {
+//    if (err) {
+//        return console.error(err);
+//    }
+//    console.log('instance.name: ' + instance.name + ' saved');
+//});
 
 // lets run a query
-/*
 mongoose.models.Movie.find(function (err, movies) {
     if (err) {
         return console.error(err);
@@ -92,7 +88,6 @@ mongoose.models.Movie.find(function (err, movies) {
         }
     }
 });
-*/
 
 
 /**
@@ -260,7 +255,6 @@ var sendNotFoundResponse = function (req, res) {
  * Render Movie Write Template (POST, PUT)
  */
 var renderMovieCollectionTemplate = function () {
-    console.log('test');
     var template = {};
     var item = {};
 
