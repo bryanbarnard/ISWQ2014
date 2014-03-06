@@ -49,7 +49,7 @@ mongoose.connection.on('disconnected', function () {
 
 // On Connection
 mongoose.connection.once('open', function callback () {
-    log.info('mongod connected successfully');
+    log.info('mongodb connected successfully');
 });
 
 
@@ -66,8 +66,10 @@ fs.readdirSync('../models').forEach(function (file) {
  */
 
 // create and save movie
+/*
 var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
 log.info('instance.name: ' + instance.name);
+*/
 
 //instance.save(function (err, instance) {
 //    if (err) {
@@ -76,18 +78,19 @@ log.info('instance.name: ' + instance.name);
 //    console.log('instance.name: ' + instance.name + ' saved');
 //});
 
-// lets run a query
+//get movies from DB
+/*
 mongoose.models.Movie.find(function (err, movies) {
     if (err) {
+        log.error(err);
         return console.error(err);
     }
 
     if (movies && movies.length > 0) {
-        for (var i = 0; i < movies.length; i++) {
-            log.info({movie: movies[i]});
-        }
+        log.info({movies: movies});
     }
 });
+*/
 
 
 /**
@@ -103,7 +106,7 @@ var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 var createResponseCjTemplate = function() {
     responseCj.collection = {};
     responseCj.collection.version = "1.0";
-    responseCj.collection.href = base + path;
+    responseCj.collection.href = base;
     responseCj.collection.links = [];
     responseCj.collection.items = [];
     responseCj.collection.queries = [];
@@ -116,6 +119,9 @@ var createResponseCjTemplate = function() {
  * @param res
  */
 var handler = function (req, res) {
+    var segments, i, x, parts, flg;
+
+
     //some simple content negotiation
     if (req.headers.accept && req.headers.accept.indexOf('application/vnd.collection+json') != -1) {
         contentType = 'application/vnd.collection+json';
@@ -123,11 +129,19 @@ var handler = function (req, res) {
         contentType = 'application/json';
     }
 
-    var flg = false;
-    root = 'http://' + req.headers.host;
-    base = 'http://' + req.headers.host;
-    path = url.parse(req.url).pathname;
+    // parse incoming request URL
+    parts = [];
+    segments = req.url.split('/');
+    for(i=0, x=segments.length; i<x; i++) {
+        if(segments[i]!=='') {
+            parts.push(segments[i]);
+        }
+    }
 
+    flg = false;
+    root = 'http://' + req.headers.host;
+    base = root + '/api/';
+    path = url.parse(req.url).pathname;
 
     //capture request body
     requestBody = '';
@@ -138,7 +152,7 @@ var handler = function (req, res) {
     //billboard route - RegExp('^\/api\/$','i')
     if (reAPIBillboard.test(req.url)) {
         flg = true;
-        console.log('reAPIBillboard true');
+        log.info('request handler route => reAPIBillboard');
 
         switch(req.method) {
             case 'GET':
@@ -152,7 +166,7 @@ var handler = function (req, res) {
     //movies collection route - RegExp('^\/api\/movies$','i')
     if (flg === false && reAPIListMovies.test(req.url)) {
         flg = true;
-        console.log('reAPIListMovies true');
+        log.info('request handler route => reAPIListMovies');
 
         switch(req.method) {
             case 'GET':
@@ -172,11 +186,11 @@ var handler = function (req, res) {
     //movie item route - RegExp('^\/api\/movies\/.*','i')
     if (flg === false && reAPIItemMovies.test(req.url)) {
         flg = true;
-        console.log('reAPIItemMovies true');
+        log.info('request handler route => reAPIItemMovies');
 
         switch(req.method) {
             case 'GET':
-                sendItemResponseMovies(req, res);
+                sendItemResponseMovies(req, res, parts[2]);
                 break;
             case 'POST':
                 //sendNotAcceptedResponse
@@ -194,7 +208,7 @@ var handler = function (req, res) {
 
     //not found
     if (flg === false) {
-        console.log('send not found');
+        log.info('request handler route not found. URL: ' + req.url);
         sendNotFoundResponse(req, res);
     }
 };
@@ -203,7 +217,6 @@ var sendAddMovieResponse = function (req, res) {
     req.on('end', function () {
 
         //TODO: add validation and add functionality
-
 
         //build response
         var id = uuid();
@@ -330,7 +343,6 @@ var renderMovieCollectionQueries = function () {
     query.prompt = 'Sort by Name';
     query.href = base + '/movies/sortbyname';
     responseCj.collection.queries.push(query);
-
 };
 
 /**
@@ -338,74 +350,79 @@ var renderMovieCollectionQueries = function () {
  */
 var renderMovieCollectionItems = function (coll) {
 
-    var item = {};
-    var dataItem = {};
+    var item, dataItem, linkItem;
     responseCj.collection.items = [];
 
-    id = '613856331910938';
-    item.href = base + '/' + id;
-    item.data = [];
-    item.links = [];
+    //iterate coll
+    if (coll && coll.length > 0) {
+        for (var i = 0; i < coll.length; i++) {
 
+            //item
+            item = {};
+            item.links = [];
+            item.data = [];
+            item.href = base + 'movies/' + coll[i].id;
 
-    dataItem = {};
-    dataItem.name = 'description';
-    dataItem.value = 'An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.';
-    dataItem.prompt = 'description of movie';
-    item.data.push(dataItem);
+            //data
+            dataItem = {};
+            dataItem.name = 'description';
+            dataItem.value = coll[i].description;
+            dataItem.prompt = 'description of movie';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'datePublished'
-    dataItem.value = '2013-03-28T21:51:08.406Z';
-    dataItem.prompt = 'date movie was published';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'datePublished'
+            dataItem.value = coll[i].datePublished;
+            dataItem.prompt = 'date movie was published';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'name'
-    dataItem.value = 'Caddyshack';
-    dataItem.prompt = 'title of the movie';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'name'
+            dataItem.value = coll[i].name;
+            dataItem.prompt = 'title of the movie';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'about'
-    dataItem.value = 'An exclusive golf course has to deal with a brash new member and a destructive dancing gopher.';
-    dataItem.prompt = 'short description of this item';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'about'
+            dataItem.value = coll[i].about;
+            dataItem.prompt = 'short description of this item';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'genre';
-    dataItem.value = 'comedy';
-    dataItem.prompt = 'movie genre';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'genre';
+            dataItem.value = coll[i].genre;
+            dataItem.prompt = 'movie genre';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'version';
-    dataItem.value = '1';
-    dataItem.prompt = 'version of this release';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'version';
+            dataItem.value = coll[i].version;
+            dataItem.prompt = 'version of this release';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'timeRequired';
-    dataItem.value = 'PT180M';
-    dataItem.prompt = 'time required to view this movie, aka duration';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'timeRequired';
+            dataItem.value = coll[i].timeRequired;
+            dataItem.prompt = 'time required to view this movie, aka duration';
+            item.data.push(dataItem);
 
-    dataItem = {};
-    dataItem.name = 'contentRating';
-    dataItem.value = 'R';
-    dataItem.prompt = 'rating of the movie';
-    item.data.push(dataItem);
+            dataItem = {};
+            dataItem.name = 'contentRating';
+            dataItem.value = coll[i].contentRating;
+            dataItem.prompt = 'rating of the movie';
+            item.data.push(dataItem);
 
-    linkItem = {};
-    linkItem.name = "harold ramis";
-    linkItem.rel = 'directory';
-    linkItem.prompt = 'director of the movie';
-    linkItem.href = base + path + '/' + id;
-    linkItem.render = 'link';
-    item.links.push(linkItem);
+            linkItem = {};
+            linkItem.name = coll[i].director;
+            linkItem.rel = 'director';
+            linkItem.prompt = 'director of the movie';
+            linkItem.href = base + 'persons/' + coll[i].director_id;
+            linkItem.render = 'link';
+            item.links.push(linkItem);
 
-    responseCj.collection.items.push(item);
-
+            responseCj.collection.items.push(item);
+        }
+    }
 };
 
 /**
@@ -416,7 +433,7 @@ var renderMovieCollectionLinks = function () {
     var link = {};
 
     link = {};
-    link.href = base + path;
+    link.href = base + 'movies';
     link.rel = 'home';
     responseCj.collection.links.push(link);
 
@@ -429,41 +446,81 @@ var renderMovieCollectionLinks = function () {
 var sendListResponseMovies = function (req, res) {
     req.on('end', function () {
 
-        var coll = []; //TODO: add mongodb call here to get collection
+        //get movies from DB
+        mongoose.models.Movie.find(function (err, movies) {
+            if (err) {
+                log.error(err);
+                return console.error(err);
+            }
 
-        //build response
-        createResponseCjTemplate();
-        renderMovieCollectionLinks();
-        renderMovieCollectionItems(coll);
-        renderMovieCollectionQueries();
-        renderMovieCollectionTemplate();
+            if (movies && movies.length > 0) {
 
-        responseBody = JSON.stringify(responseCj);
-        responseHeaders = {
-            'Content-Type': contentType,
-            'Content-Length': Buffer.byteLength(responseBody)
-        }
-        responseStatus = 200;
-        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+                //build response
+                createResponseCjTemplate();
+                renderMovieCollectionLinks();
+                renderMovieCollectionItems(movies);
+                renderMovieCollectionQueries();
+                renderMovieCollectionTemplate();
+
+                responseBody = JSON.stringify(responseCj);
+                responseHeaders = {
+                    'Content-Type': contentType,
+                    'Content-Length': Buffer.byteLength(responseBody)
+                }
+                responseStatus = 200;
+                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            }
+        });
     });
 };
 
-var sendItemResponseMovies = function (req, res) {
+var sendItemResponseMovies = function (req, res, movieId) {
     req.on('end', function () {
-        //build response
 
-        responseCj = movieItemStatic;
-        responseBody = JSON.stringify(responseCj);
-        responseHeaders = {
-            'Content-Type': contentType,
-            'Content-Length': Buffer.byteLength(responseBody)
-        }
-        responseStatus = 200;
+        log.info('movieId:' + movieId);
+        //get movies from DB
+        mongoose.models.Movie.findOne({'id': movieId}, function (err, movie) {
+            if (err) {
+                log.error(err);
+                return console.error(err);
+            }
 
-        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            if (movie) {
+                //build response
+                createResponseCjTemplate();
+                renderMovieCollectionLinks();
+                renderMovieCollectionItems([movie]);
+                renderMovieCollectionQueries();
+                renderMovieCollectionTemplate();
+
+                responseBody = JSON.stringify(responseCj);
+                responseHeaders = {
+                    'Content-Type': contentType,
+                    'Content-Length': Buffer.byteLength(responseBody)
+                }
+                responseStatus = 200;
+                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            } else {
+                responseBody = null;
+                responseHeaders = {
+                    'Content-Type': contentType
+                }
+                responseStatus = 404;
+                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+
+            }
+        });
     });
 };
 
+/**
+ * send the http response to client
+ * @param req
+ * @param res
+ * @param responseStatus
+ * @param responseHeaders
+ * @param responseBody
+ */
 var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
     res.writeHead(responseStatus, responseHeaders);
     res.end(responseBody);
@@ -472,6 +529,8 @@ var sendResponse = function (req, res, responseStatus, responseHeaders, response
 
 //main
 http.createServer(handler).listen(port);
+log.info('http server listening http://localhost:' + port + '/api/');
+
 
 /*
 var cjTemplate = {

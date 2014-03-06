@@ -8,6 +8,7 @@ var Schema = mongoose.Schema;
  * movie schema
  */
 var MovieSchema = new Schema({
+    id: { type: String, default: '' },
     name: { type: String, default: '' },
     description: { type: String, default: '' },
     datePublished: { type: String, default: '' },
@@ -17,7 +18,7 @@ var MovieSchema = new Schema({
     timeRequired: { type: String, default: '' },
     contentRating: { type: String, default: '' },
     director: { type: String, default: '' },
-    actors: { type: String, default: '' }
+    director_id: { type: String, default: '' }
 });
 
 /**

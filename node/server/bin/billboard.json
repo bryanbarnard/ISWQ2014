@@ -7,16 +7,19 @@
             "rel": "profile"
         },
         {
-            "href": "http://localhost:1337/api/movies/",
+            "href": "http://localhost:1337/api/movies",
             "prompt": "Movies List",
             "rel": "movies"
         },
         {
-            "href": "http://localhost:1337/api/persons/",
+            "href": "http://localhost:1337/api/persons",
             "prompt": "Persons List",
             "rel": "persons"
+        },
+        {
+            "href": "http://localhost:1337/api/docs",
+            "prompt": "Documentation",
+            "rel": "docs"
         }
-    ],
-    "queries": [],
-    "templates": []
+    ]
 }}
