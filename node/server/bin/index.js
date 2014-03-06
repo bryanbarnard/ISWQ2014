@@ -235,8 +235,7 @@ var sendAddMovieResponse = function (req, res) {
 
 var sendBillboardResponse = function (req, res) {
     req.on('end', function () {
-        //build response
-
+        responseCj = null;
         responseCj = billboardResponseStatic;
         responseBody = JSON.stringify(responseCj);
         responseHeaders = {
@@ -446,7 +445,7 @@ var renderMovieCollectionLinks = function () {
 var sendListResponseMovies = function (req, res) {
     req.on('end', function () {
 
-        //get movies from DB
+        responseCj = {};
         mongoose.models.Movie.find(function (err, movies) {
             if (err) {
                 log.error(err);
@@ -454,8 +453,6 @@ var sendListResponseMovies = function (req, res) {
             }
 
             if (movies && movies.length > 0) {
-
-                //build response
                 createResponseCjTemplate();
                 renderMovieCollectionLinks();
                 renderMovieCollectionItems(movies);
@@ -477,8 +474,7 @@ var sendListResponseMovies = function (req, res) {
 var sendItemResponseMovies = function (req, res, movieId) {
     req.on('end', function () {
 
-        log.info('movieId:' + movieId);
-        //get movies from DB
+        responseCj = {};
         mongoose.models.Movie.findOne({'id': movieId}, function (err, movie) {
             if (err) {
                 log.error(err);
@@ -486,7 +482,6 @@ var sendItemResponseMovies = function (req, res, movieId) {
             }
 
             if (movie) {
-                //build response
                 createResponseCjTemplate();
                 renderMovieCollectionLinks();
                 renderMovieCollectionItems([movie]);
