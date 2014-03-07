@@ -1,16 +1,15 @@
 //imports
-
 var http = require('http');
 var url = require('url');
 var crypto = require('crypto');
 var uuid = require('node-uuid');
 var querystring = require('querystring');
-var movieCollectionStatic = require('./movie_collection.json');
-var movieItemStatic = require('./movie_item.json');
-var billboardResponseStatic = require('./billboard.json');
 var mongoose = require('mongoose');
 var fs = require('fs');
 var bunyan = require('bunyan');
+//var movieCollectionStatic = require('./movie_collection.json');
+//var movieItemStatic = require('./movie_item.json');
+//var billboardResponseStatic = require('./billboard.json');
 
 //variables
 var port = (process.env.PORT || 1337);
@@ -37,15 +36,18 @@ var connect = function () {
 }
 connect();
 
+
 // Error handler
 mongoose.connection.on('error', function (err) {
     log.info(err)
 });
 
+
 // Reconnect when closed
 mongoose.connection.on('disconnected', function () {
     connect()
 });
+
 
 // On Connection
 mongoose.connection.once('open', function callback () {
@@ -115,8 +117,6 @@ var createResponseCjTemplate = function() {
 
 /**
  * Handle incoming requests
- * @param req
- * @param res
  */
 var handler = function (req, res) {
     var segments, i, x, parts, flg;
@@ -159,6 +159,7 @@ var handler = function (req, res) {
                 sendBillboardResponse(req, res);
                 break;
             default:
+                sendErrorResponse(req, res, 'Method Not Allowed', 405);
                 break;
         }
     }
@@ -175,10 +176,8 @@ var handler = function (req, res) {
             case 'POST':
                 sendAddMovieResponse(req, res);
                 break;
-            case 'DELETE':
-                sendDeleteResponse(req, res);
-                break;
             default:
+                sendErrorResponse(req, res, 'Method Not Allowed', 405);
                 break;
         }
     }
@@ -192,8 +191,6 @@ var handler = function (req, res) {
             case 'GET':
                 sendItemResponseMovies(req, res, parts[2]);
                 break;
-            case 'POST':
-                //sendNotAcceptedResponse
             case 'PUT':
                 //sendItemUpdateResponseMovies(req, res);
                 break;
@@ -201,66 +198,184 @@ var handler = function (req, res) {
                 sendDeleteResponse(req, res);
                 break;
             default:
+                sendErrorResponse(req, res, 'Method Not Allowed', 405);
                 break;
         }
     }
 
-
     //not found
     if (flg === false) {
         log.info('request handler route not found. URL: ' + req.url);
-        sendNotFoundResponse(req, res);
+        sendErrorResponse(req, res, 'Resource Not Found', 404);
     }
 };
 
+
 var sendAddMovieResponse = function (req, res) {
     req.on('end', function () {
+        try {
+            //TODO: add validation and add functionality
 
-        //TODO: add validation and add functionality
+            //build response
+            var id = uuid();
+            id = id.replace(/-/g,'');
 
-        //build response
-        var id = uuid();
-        id = id.replace(/-/g,'');
+            //responseCj = billboardResponseStatic;
+            responseBody = '';
+            responseHeaders = {
+                'Location': base + 'movies/' + id
+            }
 
-        //responseCj = billboardResponseStatic;
-        responseBody = '';
-        responseHeaders = {
-            'Location': base + 'movies/' + id
+            responseStatus = 201;
+            sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+
+        } catch (ex) {
+            sendErrorResponseHelper(req, res, 'Server Error', 500);
         }
-        responseStatus = 201;
-
-        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
     });
 };
 
+
 var sendBillboardResponse = function (req, res) {
     req.on('end', function () {
-        responseCj = null;
-        responseCj = billboardResponseStatic;
-        responseBody = JSON.stringify(responseCj);
-        responseHeaders = {
-            'Content-Type': contentType,
-            'Content-Length': Buffer.byteLength(responseBody)
-        }
-        responseStatus = 200;
+        try {
+            responseCj = {};
+            renderBillboardCollection();
+            responseBody = JSON.stringify(responseCj);
+            responseHeaders = {
+                'Content-Type': contentType,
+                'Content-Length': Buffer.byteLength(responseBody)
+            }
+            responseStatus = 200;
 
-        sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+        } catch (ex) {
+            sendErrorResponseHelper(req, res, 'Server Error', 500);
+        }
     });
 };
 
 
 var sendDeleteResponse = function (req, res) {
-    responseBody = '';
-    responseHeaders = {};
-    responseStatus = 204;
+    req.on('end', function () {
+        try {
+            responseBody = '';
+            responseHeaders = {};
+            responseStatus = 204;
+
+            sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+        } catch (ex) {
+            sendErrorResponseHelper(req, res, 'Server Error', 500);
+        }
+    });
+};
+
+
+var sendListResponseMovies = function (req, res) {
+    req.on('end', function () {
+        try {
+            responseCj = {};
+            mongoose.models.Movie.find(function (err, movies) {
+                if (err) {
+                    log.error(err);
+                    return console.error(err);
+                }
+
+                if (movies && movies.length > 0) {
+                    createResponseCjTemplate();
+                    renderMovieCollectionLinks();
+                    renderMovieCollectionItems(movies);
+                    renderMovieCollectionQueries();
+                    renderMovieCollectionTemplate();
+
+                    responseBody = JSON.stringify(responseCj);
+                    responseHeaders = {
+                        'Content-Type': contentType,
+                        'Content-Length': Buffer.byteLength(responseBody)
+                    }
+                    responseStatus = 200;
+                    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+                }
+            });
+        } catch (ex) {
+            sendErrorResponseHelper(req, res, 'Server Error', 500);
+        }
+    });
+};
+
+
+var sendItemResponseMovies = function (req, res, movieId) {
+    req.on('end', function () {
+        try {
+            responseCj = {};
+            mongoose.models.Movie.findOne({'id': movieId}, function (err, movie) {
+                if (err) {
+                    log.error(err);
+                    return console.error(err);
+                }
+
+                if (movie) {
+                    createResponseCjTemplate();
+                    renderMovieCollectionLinks();
+                    renderMovieCollectionItems([movie]);
+                    renderMovieCollectionQueries();
+                    renderMovieCollectionTemplate();
+
+                    responseBody = JSON.stringify(responseCj);
+                    responseHeaders = {
+                        'Content-Type': contentType,
+                        'Content-Length': Buffer.byteLength(responseBody)
+                    }
+                    responseStatus = 200;
+                    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+                } else {
+                    responseBody = null;
+                    responseHeaders = {
+                        'Content-Type': contentType
+                    }
+                    responseStatus = 404;
+                    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+                }
+            });
+        } catch (ex) {
+            sendErrorResponseHelper(req, res, 'Server Error', 500);
+        }
+    });
+};
+
+var sendErrorResponse = function (req, res, title, code) {
+    req.on('end', function () {
+       sendErrorResponseHelper(req, res, title, code);
+    });
+};
+
+var sendErrorResponseHelper = function (req, res, title, code) {
+    responseCj = {};
+    responseCj.collection = {};
+    responseCj.collection.version = "1.0";
+    responseCj.collection.href = base;
+    responseCj.error = {
+        title : title,
+        code: code
+    };
+
+    responseBody = JSON.stringify(responseCj);
+    responseHeaders = {
+        'Content-Type': contentType,
+        'Content-Length': Buffer.byteLength(responseBody)
+    }
+    responseStatus = code;
+
     sendResponse(req, res, responseStatus, responseHeaders, responseBody);
 };
 
-var sendNotFoundResponse = function (req, res) {
-    responseBody = '';
-    responseHeaders = {};
-    responseStatus = 404;
-    sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+
+/**
+ * send the http response to client
+ */
+var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
+    res.writeHead(responseStatus, responseHeaders);
+    res.end(responseBody);
 };
 
 /**
@@ -442,150 +557,45 @@ var renderMovieCollectionLinks = function () {
     responseCj.collection.links.push(link);
 };
 
-var sendListResponseMovies = function (req, res) {
-    req.on('end', function () {
+var renderBillboardCollection = function () {
+    var links, linkItem;
+    links = [];
 
-        responseCj = {};
-        mongoose.models.Movie.find(function (err, movies) {
-            if (err) {
-                log.error(err);
-                return console.error(err);
-            }
+    responseCj = {};
+    responseCj.collection = {};
+    responseCj.collection.version = 1.0;
+    responseCj.href = base;
 
-            if (movies && movies.length > 0) {
-                createResponseCjTemplate();
-                renderMovieCollectionLinks();
-                renderMovieCollectionItems(movies);
-                renderMovieCollectionQueries();
-                renderMovieCollectionTemplate();
+    linkItem = {};
+    linkItem.href = base + "movie-apls.xml";
+    linkItem.rel = "profile";
+    links.push(linkItem);
 
-                responseBody = JSON.stringify(responseCj);
-                responseHeaders = {
-                    'Content-Type': contentType,
-                    'Content-Length': Buffer.byteLength(responseBody)
-                }
-                responseStatus = 200;
-                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
-            }
-        });
-    });
-};
+    linkItem = {};
+    linkItem.href = base + "movies";
+    linkItem.prompt = "Movies Collection"
+    linkItem.rel = "movies";
+    links.push(linkItem);
 
-var sendItemResponseMovies = function (req, res, movieId) {
-    req.on('end', function () {
+    linkItem = {};
+    linkItem.href = base + "persons";
+    linkItem.prompt = "Persons Collection"
+    linkItem.rel = "persons";
+    links.push(linkItem);
 
-        responseCj = {};
-        mongoose.models.Movie.findOne({'id': movieId}, function (err, movie) {
-            if (err) {
-                log.error(err);
-                return console.error(err);
-            }
+    linkItem = {};
+    linkItem.href = base + "docs";
+    linkItem.prompt = "API Documentation"
+    linkItem.rel = "documentation";
+    links.push(linkItem);
 
-            if (movie) {
-                createResponseCjTemplate();
-                renderMovieCollectionLinks();
-                renderMovieCollectionItems([movie]);
-                renderMovieCollectionQueries();
-                renderMovieCollectionTemplate();
-
-                responseBody = JSON.stringify(responseCj);
-                responseHeaders = {
-                    'Content-Type': contentType,
-                    'Content-Length': Buffer.byteLength(responseBody)
-                }
-                responseStatus = 200;
-                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
-            } else {
-                responseBody = null;
-                responseHeaders = {
-                    'Content-Type': contentType
-                }
-                responseStatus = 404;
-                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
-
-            }
-        });
-    });
-};
-
-/**
- * send the http response to client
- * @param req
- * @param res
- * @param responseStatus
- * @param responseHeaders
- * @param responseBody
- */
-var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
-    res.writeHead(responseStatus, responseHeaders);
-    res.end(responseBody);
+    responseCj.links = links;
 };
 
 
 //main
 http.createServer(handler).listen(port);
 log.info('http server listening http://localhost:' + port + '/api/');
-
-
-/*
-var cjTemplate = {
-    "collection":
-    {
-        "version":"0.1",
-        "href": base,
-        "links":[
-            base + "/movies",
-            base + "/actors"
-        ],
-        "items":[],
-        "queries":[],
-        "template":{},
-        "error":{}
-    }
-};
-/*
-
-/*
- var server = http.createServer(function(request, response) {
- var body = '';
-
- request.on('data', function (chunk) {
- body += chunk;
- });
-
- request.on('end', function () {
- var now = new Date();
- var msg = '';
-
- console.log('request received: ' + now.toISOString());
- console.log('request.method: ' + request.method);
- console.log('request.url: ' + request.url);
- console.log('request.httpVersion: ' + request.httpVersion);
- console.log('request.headers:');
-
- //log headers
- for (var header in request.headers) {
- console.log('  ' + header + ': ' + request.headers[header]);
- }
-
- console.log('request.body:');
- //console.log('  ' + body);
-
- try {
- msg = JSON.parse(body);
- console.log(JSON.stringify(msg, null, 4)); //4 is the spacer arg
- }
- catch(ex) {
- console.log('error parsing body as JSON');
- }
-
- console.log(); //insert line break
- response.writeHead(200);
- response.end();
- });
- }).listen(port, 'localhost');
- console.log('server listening at http://localhost:8080');
- */
 
 /**
  * Sample Requests
