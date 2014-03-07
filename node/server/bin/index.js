@@ -11,6 +11,7 @@ var bunyan = require('bunyan');
 //var movieItemStatic = require('./movie_item.json');
 //var billboardResponseStatic = require('./billboard.json');
 
+
 //variables
 var port = (process.env.PORT || 1337);
 var root = '';
@@ -66,7 +67,6 @@ fs.readdirSync('../models').forEach(function (file) {
 /**
  * Lets Run Some Tests with Mongoose
  */
-
 // create and save movie
 /*
 var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
@@ -102,18 +102,6 @@ var reAPIBillboard = new RegExp('^\/api\/$','i');
 var reAPIListMovies = new RegExp('^\/api\/movies$','i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 
-/**
- * Create Collection JSON Response Template
- */
-var createResponseCjTemplate = function() {
-    responseCj.collection = {};
-    responseCj.collection.version = "1.0";
-    responseCj.collection.href = base;
-    responseCj.collection.links = [];
-    responseCj.collection.items = [];
-    responseCj.collection.queries = [];
-    responseCj.collection.template = {};
-};
 
 /**
  * Handle incoming requests
@@ -143,7 +131,6 @@ var handler = function (req, res) {
     base = root + '/api/';
     path = url.parse(req.url).pathname;
 
-    //capture request body
     requestBody = '';
     req.on('data', function (chunk) {
         requestBody += chunk;
@@ -210,24 +197,42 @@ var handler = function (req, res) {
     }
 };
 
-
+/**
+ *  Create a new Movie Resource
+ */
 var sendAddMovieResponse = function (req, res) {
     req.on('end', function () {
         try {
-            //TODO: add validation and add functionality
-
-            //build response
             var id = uuid();
             id = id.replace(/-/g,'');
 
-            //responseCj = billboardResponseStatic;
-            responseBody = '';
-            responseHeaders = {
-                'Location': base + 'movies/' + id
+            var requestMsg = JSON.parse(requestBody);
+            log.info({requestMsg: requestMsg}, "log incoming movie post");
+
+            var movie = {};
+            for (var i = 0; i < requestMsg.template.data.length; i++) {
+                movie[requestMsg.template.data[i].name] = requestMsg.template.data[i].value;
             }
 
-            responseStatus = 201;
-            sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            if (movie) {movie.id = id};
+
+            log.info({newMovie: movie}, 'logging json parse');
+            var movieInstance = new mongoose.models.Movie(movie);
+
+            movieInstance.save(function (err, movieInstance) {
+                if (err) {
+                    log.error(err);
+                    sendErrorResponseHelper(req, res, 'Server Error', 500);
+                }
+
+                responseBody = '';
+                responseHeaders = {
+                    'Location': base + 'movies/' + id
+                }
+
+                responseStatus = 201;
+                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            });
 
         } catch (ex) {
             sendErrorResponseHelper(req, res, 'Server Error', 500);
@@ -374,6 +379,8 @@ var sendErrorResponseHelper = function (req, res, title, code) {
  * send the http response to client
  */
 var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
+    responseHeaders["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    responseHeaders["Connection"] = "Close";
     res.writeHead(responseStatus, responseHeaders);
     res.end(responseBody);
 };
@@ -563,7 +570,7 @@ var renderBillboardCollection = function () {
 
     responseCj = {};
     responseCj.collection = {};
-    responseCj.collection.version = 1.0;
+    responseCj.collection.version = "1.0";
     responseCj.href = base;
 
     linkItem = {};
@@ -590,6 +597,20 @@ var renderBillboardCollection = function () {
     links.push(linkItem);
 
     responseCj.links = links;
+};
+
+
+/**
+ * Create Collection JSON Response Template
+ */
+var createResponseCjTemplate = function() {
+    responseCj.collection = {};
+    responseCj.collection.version = "1.0";
+    responseCj.collection.href = base;
+    responseCj.collection.links = [];
+    responseCj.collection.items = [];
+    responseCj.collection.queries = [];
+    responseCj.collection.template = {};
 };
 
 
