@@ -13,7 +13,7 @@ var bunyan = require('bunyan');
 
 
 //variables
-var port = (process.env.PORT || 1337);
+var port = (process.env.PORT || 80);
 var root = '';
 var path = '';
 var base = '/';
