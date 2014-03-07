@@ -179,10 +179,10 @@ var handler = function (req, res) {
                 sendItemResponseMovies(req, res, parts[2]);
                 break;
             case 'PUT':
-                //sendItemUpdateResponseMovies(req, res);
+                sendItemUpdateResponseMovies(req, res, parts[2]);
                 break;
             case 'DELETE':
-                sendDeleteResponse(req, res);
+                sendDeleteResponse(req, res, parts[2]);
                 break;
             default:
                 sendErrorResponse(req, res, 'Method Not Allowed', 405);
@@ -261,13 +261,21 @@ var sendBillboardResponse = function (req, res) {
 };
 
 
-var sendDeleteResponse = function (req, res) {
+var sendDeleteResponse = function (req, res, movieId) {
     req.on('end', function () {
         try {
+
+           mongoose.models.Movie.findOneAndRemove({id: movieId}, function (err, movie) {
+              if (err) {
+                  log.error(err);
+                  sendErrorResponseHelper(req, res, 'Server Error', 500);
+              }
+              log.info('movie ' + movieId + ' - ' + movie.name + ' deleted from db');
+           })
+
             responseBody = '';
             responseHeaders = {};
             responseStatus = 204;
-
             sendResponse(req, res, responseStatus, responseHeaders, responseBody);
         } catch (ex) {
             sendErrorResponseHelper(req, res, 'Server Error', 500);
@@ -283,7 +291,7 @@ var sendListResponseMovies = function (req, res) {
             mongoose.models.Movie.find(function (err, movies) {
                 if (err) {
                     log.error(err);
-                    return console.error(err);
+                    sendErrorResponseHelper(req, res, 'Server Error', 500);
                 }
 
                 if (movies && movies.length > 0) {
