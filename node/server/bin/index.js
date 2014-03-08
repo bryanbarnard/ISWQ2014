@@ -13,7 +13,7 @@ var bunyan = require('bunyan');
 
 
 //variables
-var port = (process.env.PORT || 80);
+var port = (process.env.PORT || 1337);
 var root = '';
 var path = '';
 var base = '/';
@@ -109,7 +109,6 @@ var reAPIItemMovies = new RegExp('^\/api\/movies\/.*','i');
 var handler = function (req, res) {
     var segments, i, x, parts, flg;
 
-
     //some simple content negotiation
     if (req.headers.accept && req.headers.accept.indexOf('application/vnd.collection+json') != -1) {
         contentType = 'application/vnd.collection+json';
@@ -139,7 +138,7 @@ var handler = function (req, res) {
     //billboard route - RegExp('^\/api\/$','i')
     if (reAPIBillboard.test(req.url)) {
         flg = true;
-        log.info('request handler route => reAPIBillboard');
+        log.info('request handler route => ' + req.method + ':reAPIBillboard');
 
         switch(req.method) {
             case 'GET':
@@ -154,7 +153,7 @@ var handler = function (req, res) {
     //movies collection route - RegExp('^\/api\/movies$','i')
     if (flg === false && reAPIListMovies.test(req.url)) {
         flg = true;
-        log.info('request handler route => reAPIListMovies');
+        log.info('request handler route => ' + req.method + ':reAPIListMovies');
 
         switch(req.method) {
             case 'GET':
@@ -172,7 +171,7 @@ var handler = function (req, res) {
     //movie item route - RegExp('^\/api\/movies\/.*','i')
     if (flg === false && reAPIItemMovies.test(req.url)) {
         flg = true;
-        log.info('request handler route => reAPIItemMovies');
+        log.info('request handler route => ' + req.method + ':reAPIItemMovies');
 
         switch(req.method) {
             case 'GET':
@@ -214,7 +213,12 @@ var sendAddMovieResponse = function (req, res) {
                 movie[requestMsg.template.data[i].name] = requestMsg.template.data[i].value;
             }
 
-            if (movie) {movie.id = id};
+            //add default attributes
+            if (movie) {
+                movie.id = id,
+                movie.created_on = new Date();
+                movie.updated_on = new Date();
+            };
 
             log.info({newMovie: movie}, 'logging json parse');
             var movieInstance = new mongoose.models.Movie(movie);
@@ -387,8 +391,11 @@ var sendErrorResponseHelper = function (req, res, title, code) {
  * send the http response to client
  */
 var sendResponse = function (req, res, responseStatus, responseHeaders, responseBody) {
+    var now = new Date();
+
     responseHeaders["Cache-Control"] = "no-cache, no-store, must-revalidate";
     responseHeaders["Connection"] = "Close";
+    responseHeaders["Date"] = now.toISOString();
     res.writeHead(responseStatus, responseHeaders);
     res.end(responseBody);
 };
@@ -440,7 +447,7 @@ var renderMovieCollectionTemplate = function () {
     item = {};
     item.name = 'version';
     item.value = '';
-    item.prompt = 'version of thie release';
+    item.prompt = 'version of this release';
     item.required = 'true';
     template.data.push(item);
 
@@ -488,11 +495,26 @@ var renderMovieCollectionItems = function (coll) {
 
             //item
             item = {};
-            item.links = [];
-            item.data = [];
             item.href = base + 'movies/' + coll[i].id;
+            item.data = [];
+            item.links = [];
+
+            //linkItem
+            linkItem = {};
+            linkItem.name = coll[i].director;
+            linkItem.rel = 'director';
+            linkItem.prompt = 'director of the movie';
+            linkItem.href = base + 'persons/' + coll[i].director_id;
+            linkItem.render = 'link';
+            item.links.push(linkItem);
 
             //data
+            dataItem = {};
+            dataItem.name = 'name'
+            dataItem.value = coll[i].name;
+            dataItem.prompt = 'title of the movie';
+            item.data.push(dataItem);
+
             dataItem = {};
             dataItem.name = 'description';
             dataItem.value = coll[i].description;
@@ -503,12 +525,6 @@ var renderMovieCollectionItems = function (coll) {
             dataItem.name = 'datePublished'
             dataItem.value = coll[i].datePublished;
             dataItem.prompt = 'date movie was published';
-            item.data.push(dataItem);
-
-            dataItem = {};
-            dataItem.name = 'name'
-            dataItem.value = coll[i].name;
-            dataItem.prompt = 'title of the movie';
             item.data.push(dataItem);
 
             dataItem = {};
@@ -541,14 +557,6 @@ var renderMovieCollectionItems = function (coll) {
             dataItem.prompt = 'rating of the movie';
             item.data.push(dataItem);
 
-            linkItem = {};
-            linkItem.name = coll[i].director;
-            linkItem.rel = 'director';
-            linkItem.prompt = 'director of the movie';
-            linkItem.href = base + 'persons/' + coll[i].director_id;
-            linkItem.render = 'link';
-            item.links.push(linkItem);
-
             responseCj.collection.items.push(item);
         }
     }
@@ -558,7 +566,6 @@ var renderMovieCollectionItems = function (coll) {
  * Build and render MovieCollection Links
  */
 var renderMovieCollectionLinks = function () {
-
     var link = {};
 
     link = {};

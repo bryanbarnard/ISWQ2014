@@ -8,18 +8,25 @@ var Schema = mongoose.Schema;
  * movie schema
  */
 var MovieSchema = new Schema({
-    id: { type: String, default: '' },
-    name: { type: String, default: '' },
-    description: { type: String, default: '' },
-    datePublished: { type: String, default: '' },
-    about: { type: String, default: '' },
-    genre: { type: String, default: '' },
-    version: { type: String, default: '' },
-    timeRequired: { type: String, default: '' },
-    contentRating: { type: String, default: '' },
+    //attributes
+    id: { type: String, unique: true, required: true, default: '' },
+    name: { type: String, required: true, default: '' },
+    description: { type: String, required: true, default: '' },
+    datePublished: { type: String, required: true, default: '' },
+    about: { type: String, required: true, default: '' },
+    genre: { type: String, required: true, default: '' },
+    version: { type: String, required: true, default: '' },
+    timeRequired: { type: String, required: true, default: '' },
+    contentRating: { type: String, required: true, default: '' },
     director: { type: String, default: '' },
-    director_id: { type: String, default: '' }
-});
+    director_id: { type: String, default: '' },
+    created_on: { type: Date },
+    updated_on: { type: Date }
+    },
+    //options
+    { collection: 'movies' },
+    { id: false }
+);
 
 /**
  * Methods
