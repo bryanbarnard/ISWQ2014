@@ -20,7 +20,6 @@ def determine_response_content_type(acceptHeader):
     else:
         return 'application/json'
 
-
 # routes
 # default
 @app.route('/')
@@ -88,9 +87,6 @@ def callback(id):
     with open('movie_item.json') as json_data:
         response_body = json.load(json_data)
         json_data.close()
-    return json.dumps(response_body)
-
-
     return json.dumps(response_body)
 
 
