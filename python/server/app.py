@@ -1,50 +1,91 @@
+"""
+BottlePy API Implementation for ISWQ2014
+"""
+import logging
+logging.basicConfig(format='%(asctime)s %(message)s')
+
+LOGGER = logging.getLogger('app')
+LOGGER.setLevel('INFO')
+
 import json
-import sys
-
-sys.path.append('models')
-
 from bottle import *
-from person import *
-from movie import *
+from models.movie import *
+from templates.LinkCJ import *
+from templates.MoviesTemplateCJ import *
+from templates.ItemCJ import *
+from templates.MoviesCollectionTemplateCJ import *
 import mongoengine
 
-# application
+HOST = 'localhost'
+PORT = 1337
+PATH = '/api/'
+BASE = 'http://'
+ROOT = BASE + HOST + ':' + str(PORT) + PATH
+
+
+# application setting
 app = default_app();
 app.config['autojson'] = False
 
 
 # setup response Content-Type
-def determine_response_content_type(acceptHeader):
-    if acceptHeader and 'application/vnd.collection+json' in acceptHeader:
+def determine_response_content_type(accept_header):
+    if accept_header and 'application/vnd.collection+json' in accept_header:
         return 'application/vnd.collection+json'
     else:
         return 'application/json'
+
 
 # routes
 # default
 @app.route('/')
 def callback():
+    LOGGER.info('ROUTE: /')
     abort(404, "not found")
 
 
 # billboard route - '^\/api$'
-@app.route(path='/api', method='GET')
+@app.route(path='/api/', method='GET')
 def callback():
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/')
+
     # check accepts and content type
     # content_type = request.headers.get('Content-Type')
     accept = request.headers.get('Accept')
     response.set_header('Content-Type', determine_response_content_type(accept))
     response.status = 200
 
-    with open('billboard.json') as json_data:
-        response_body = json.load(json_data)
-        json_data.close()
+    collection = dict()
+    links = list()
+
+    link = LinkCJ(ROOT + 'movies-alps.xml', 'profile', 'profile')
+    links.append(link.toDict())
+
+    link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
+    links.append(link.toDict())
+
+
+    link = LinkCJ(ROOT + 'persons', 'Persons Collection', 'persons')
+    links.append(link.toDict())
+
+    link = LinkCJ(ROOT + 'docs', 'API Documentation', 'documentation')
+    links.append(link.toDict())
+
+    collection['version'] = '1.0'
+    collection['href'] = ROOT
+    collection['links'] = links
+
+    response_body = {
+        'collection': collection,
+    }
+
     return json.dumps(response_body)
 
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='GET')
 def callback():
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
     # check accepts and content type
     # content_type = request.headers.get('Content-Type')
     accept = request.headers.get('Accept')
@@ -58,11 +99,15 @@ def callback():
     for movie in Movie.objects:
         print movie.name
 
-    with open('movie_collection.json') as json_data:
-        response_body = json.load(json_data)
-        json_data.close()
-    return json.dumps(response_body)
+    # with open('movie_collection.json') as json_data:
+    #     response_body = json.load(json_data)
+    #     json_data.close()
+    # return json.dumps(response_body)
 
+    response_body = MoviesCollectionTemplateCJ(ROOT)
+
+    # return json.dumps(response_body)
+    return response_body.to_json()
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
@@ -108,4 +153,4 @@ def callback(id):
     return json.dumps(response_body)
 
 # main
-run(app, host='localhost', port=1337, debug=True)
+run(app, host=HOST, port=PORT, debug=True)
