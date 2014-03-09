@@ -9,7 +9,7 @@ var Schema = mongoose.Schema;
  */
 var MovieSchema = new Schema({
     //attributes
-    id: { type: String, unique: true, required: true, default: '' },
+    id: { type: String, unique: true, default: '' },
     name: { type: String, required: true, default: '' },
     description: { type: String, required: true, default: '' },
     datePublished: { type: String, required: true, default: '' },
