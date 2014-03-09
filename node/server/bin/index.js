@@ -249,7 +249,7 @@ var sendAddMovieResponse = function (req, res) {
 
                 responseBody = '';
                 responseStatus = 201;
-                responseHeaders = { 'Location': base + 'movies/' + id };
+                responseHeaders = { 'Location': base + 'movies/' + movie.id };
                 sendResponse(req, res, responseStatus, responseHeaders, responseBody);
             });
 
