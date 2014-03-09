@@ -635,7 +635,7 @@ var renderBillboardCollection = function () {
     responseCj = {};
     responseCj.collection = {};
     responseCj.collection.version = "1.0";
-    responseCj.href = base;
+    responseCj.collection.href = base;
 
     linkItem = {};
     linkItem.href = base + "movie-apls.xml";
@@ -660,7 +660,7 @@ var renderBillboardCollection = function () {
     linkItem.rel = "documentation";
     links.push(linkItem);
 
-    responseCj.links = links;
+    responseCj.collection.links = links;
 };
 
 /**
