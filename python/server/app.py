@@ -10,10 +10,10 @@ LOGGER.setLevel('INFO')
 import json
 from bottle import *
 from models.movie import *
-from templates.LinkCJ import *
-from templates.MoviesTemplateCJ import *
-from templates.ItemCJ import *
-from templates.MoviesCollectionTemplateCJ import *
+from templates.LinkCJ import LinkCJ
+from templates.MoviesTemplateCJ import  MoviesTemplateCJ
+from templates.ItemCJ import ItemCJ
+from templates.MoviesCollectionTemplateCJ import MoviesCollectionTemplateCJ
 import mongoengine
 
 HOST = 'localhost'
@@ -86,34 +86,38 @@ def callback():
 @app.route(path='/api/movies', method='GET')
 def callback():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
-    # check accepts and content type
-    # content_type = request.headers.get('Content-Type')
-    accept = request.headers.get('Accept')
-    response.set_header('Content-Type', determine_response_content_type(accept))
-    response.status = 200
 
-    # connect to mongodb
-    mongoengine.connect('api')
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.status = 200
 
-    # iterate movies
-    for movie in Movie.objects:
-        print movie.name
+        # connect to mongodb
+        mongoengine.connect('api')
 
-    # with open('movie_collection.json') as json_data:
-    #     response_body = json.load(json_data)
-    #     json_data.close()
-    # return json.dumps(response_body)
+        # TODO: Build Collection
+        # iterate movies
+        for movie in Movie.objects:
+            print movie.name
 
-    response_body = MoviesCollectionTemplateCJ(ROOT)
+        # with open('movie_collection.json') as json_data:
+        #     response_body = json.load(json_data)
+        #     json_data.close()
+        # return json.dumps(response_body)
 
-    # return json.dumps(response_body)
-    return response_body.to_json()
+        response_body = MoviesCollectionTemplateCJ(ROOT)
+
+        # return json.dumps(response_body)
+        return response_body.to_json()
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        return
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
 def callback():
-    # check accepts and content type
-    # content_type = request.headers.get('Content-Type')
     accept = request.headers.get('Accept')
     response.set_header('Content-Type', determine_response_content_type(accept))
     response.set_header('Location', request.url + '/1234')
