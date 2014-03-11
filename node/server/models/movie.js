@@ -9,7 +9,7 @@ var Schema = mongoose.Schema;
  */
 var MovieSchema = new Schema({
     //attributes
-    id: { type: String, unique: true, default: '' },
+    sysid: { type: String, unique: true, default: '' },
     name: { type: String, required: true, default: '' },
     description: { type: String, required: true, default: '' },
     datePublished: { type: String, required: true, default: '' },
@@ -24,8 +24,7 @@ var MovieSchema = new Schema({
     updated_on: { type: Date }
     },
     //options
-    { collection: 'movies' },
-    { id: false }
+    { collection: 'movies' }
 );
 
 /**

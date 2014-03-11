@@ -234,7 +234,7 @@ var sendAddMovieResponse = function (req, res) {
 
             //add default attributes
             if (movie) {
-                movie.id = genId();
+                movie.sysid = genId();
                 movie.created_on = new Date();
                 movie.updated_on = new Date();
             }
@@ -249,7 +249,7 @@ var sendAddMovieResponse = function (req, res) {
 
                 responseBody = '';
                 responseStatus = 201;
-                responseHeaders = { 'Location': base + 'movies/' + movie.id };
+                responseHeaders = { 'Location': base + 'movies/' + movie.sysid };
                 sendResponse(req, res, responseStatus, responseHeaders, responseBody);
             });
 
@@ -262,7 +262,7 @@ var sendAddMovieResponse = function (req, res) {
 
 var sendDeleteResponse = function (req, res, movieId) {
     try {
-        mongoose.models.Movie.findOneAndRemove({id: movieId}, function (err, movie) {
+        mongoose.models.Movie.findOneAndRemove({sysid: movieId}, function (err, movie) {
             if (err) {
                 log.error(err);
                 sendErrorResponseHelper(req, res, 'Server Error', 500);
@@ -338,7 +338,7 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
                 }
 
                 log.info('validated successfully');
-                mongoose.models.Movie.findOne({'id': movieId}, function (err, existingMovie) {
+                mongoose.models.Movie.findOne({'sysid': movieId}, function (err, existingMovie) {
                     if (err) {
                         log.error(err);
                         sendErrorResponseHelper(req, res, 'Movie not found for updating, check ID', 500);
@@ -375,7 +375,7 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
 var sendItemResponseMovies = function (req, res, movieId) {
     try {
         responseCj = {};
-        mongoose.models.Movie.findOne({'id': movieId}, function (err, movie) {
+        mongoose.models.Movie.findOne({'sysid': movieId}, function (err, movie) {
             if (err) {
                 log.error(err);
                 sendErrorResponseHelper(req, res, 'Error, Invalid ID', 204);
@@ -544,7 +544,7 @@ var renderMovieCollectionItems = function (coll) {
 
             //item
             item = {};
-            item.href = base + 'movies/' + coll[i].id;
+            item.href = base + 'movies/' + coll[i].sysid;
             item.data = [];
             item.links = [];
 
