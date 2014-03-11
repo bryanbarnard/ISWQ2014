@@ -2,6 +2,7 @@
 BottlePy API Implementation for ISWQ2014
 """
 import logging
+
 logging.basicConfig(format='%(asctime)s %(message)s')
 
 LOGGER = logging.getLogger('app')
@@ -9,11 +10,11 @@ LOGGER.setLevel('INFO')
 
 import json
 from bottle import *
-from models.movie import *
+from models.Movie import *
 from templates.LinkCJ import LinkCJ
 from templates.ErrorCJ import ErrorCJ
-from templates.MoviesTemplateCJ import  MoviesTemplateCJ
-from templates.ItemCJ import ItemCJ
+from templates.MoviesTemplateCJ import MoviesTemplateCJ
+from templates.MovieItemCJ import MovieItemCJ
 from templates.MoviesCollectionTemplateCJ import MoviesCollectionTemplateCJ
 import mongoengine
 
@@ -50,37 +51,42 @@ def callback():
 def callback():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/')
 
-    # check accepts and content type
-    # content_type = request.headers.get('Content-Type')
-    accept = request.headers.get('Accept')
-    response.set_header('Content-Type', determine_response_content_type(accept))
-    response.status = 200
+    try:
+        # check accepts and content type
+        # content_type = request.headers.get('Content-Type')
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.status = 200
 
-    collection = dict()
-    links = list()
+        collection = dict()
+        links = list()
 
-    link = LinkCJ(ROOT + 'movies-alps.xml', 'profile', 'profile')
-    links.append(link.toDict())
+        link = LinkCJ(ROOT + 'movies-alps.xml', 'profile', 'profile')
+        links.append(link.to_dict())
 
-    link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
-    links.append(link.toDict())
+        link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
+        links.append(link.to_dict())
 
+        link = LinkCJ(ROOT + 'persons', 'Persons Collection', 'persons')
+        links.append(link.to_dict())
 
-    link = LinkCJ(ROOT + 'persons', 'Persons Collection', 'persons')
-    links.append(link.toDict())
+        link = LinkCJ(ROOT + 'docs', 'API Documentation', 'documentation')
+        links.append(link.to_dict())
 
-    link = LinkCJ(ROOT + 'docs', 'API Documentation', 'documentation')
-    links.append(link.toDict())
+        collection['version'] = '1.0'
+        collection['href'] = ROOT
+        collection['links'] = links
 
-    collection['version'] = '1.0'
-    collection['href'] = ROOT
-    collection['links'] = links
+        response_body = {
+            'collection': collection,
+        }
 
-    response_body = {
-        'collection': collection,
-    }
-
-    return json.dumps(response_body)
+        return json.dumps(response_body)
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
 
 
 # movies collection route - '^\/api\/movies$'
@@ -91,31 +97,27 @@ def callback():
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
-        response.status = 200
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
 
         # connect to mongodb
         mongoengine.connect('api')
 
-        # TODO: Build Collection
-        # iterate movies
-        for movie in Movie.objects:
+        limit = 5
+        for movie in Movie.objects[:limit]:
             print movie.name
+            movie_item = MovieItemCJ(ROOT, movie)
+            movie_collection.items.append(movie_item.to_dict())
 
-        # with open('movie_collection.json') as json_data:
-        #     response_body = json.load(json_data)
-        #     json_data.close()
-        # return json.dumps(response_body)
-
-        response_body = MoviesCollectionTemplateCJ(ROOT)
-
-        # return json.dumps(response_body)
-        return response_body.to_json()
+        response.status = 200
+        response_body = movie_collection.to_json()
+        return response_body
 
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
         response.status = 500
         response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
         return response_body.to_json()
+
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
@@ -154,7 +156,6 @@ def callback(id):
         response_body = json.load(json_data)
         json_data.close()
     return json.dumps(response_body)
-
 
     return json.dumps(response_body)
 

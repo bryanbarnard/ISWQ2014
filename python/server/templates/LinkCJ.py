@@ -6,5 +6,5 @@ class LinkCJ:
         self.prompt = prompt
         self.rel = rel
 
-    def toDict(self):
+    def to_dict(self):
         return {'href': self.href, 'prompt': self.prompt, 'rel': self.rel}
