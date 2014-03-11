@@ -11,6 +11,7 @@ import json
 from bottle import *
 from models.movie import *
 from templates.LinkCJ import LinkCJ
+from templates.ErrorCJ import ErrorCJ
 from templates.MoviesTemplateCJ import  MoviesTemplateCJ
 from templates.ItemCJ import ItemCJ
 from templates.MoviesCollectionTemplateCJ import MoviesCollectionTemplateCJ
@@ -113,7 +114,8 @@ def callback():
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
         response.status = 500
-        return
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
