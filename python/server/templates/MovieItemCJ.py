@@ -5,7 +5,7 @@ class MovieItemCJ:
     """simple template to represent Collection+JSON items"""
 
     def __init__(self, root, movie):
-        self.href = root + 'movies/' + str(movie.id)
+        self.href = root + 'movies/' + str(movie.sysid)
 
         self.data = list()
         self.data.append(DataCJ.create("name", movie.name, "title of movie"))

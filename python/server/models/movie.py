@@ -4,7 +4,7 @@ from mongoengine import *
 class Movie(Document):
     name = StringField(required=True)
     description = StringField(required=True)
-    id = StringField(required=True)
+    sysid = StringField(required=True)
     director = StringField()
     director_id = StringField()
     contentRating = StringField(required=True)
