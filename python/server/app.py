@@ -122,42 +122,81 @@ def callback():
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
 def callback():
-    accept = request.headers.get('Accept')
-    response.set_header('Content-Type', determine_response_content_type(accept))
-    response.set_header('Location', request.url + '/1234')
-    response.status = 201
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
+
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.set_header('Location', request.url + '/1234')
+        response.status = 201
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
 
 
 # movie item route - '^\/api\/movies\/.*'
-@app.route(path='/api/movies/<id:re:.*>', method='GET')
-def callback(id):
-    # check accepts and content type
-    # content_type = request.headers.get('Content-Type')
-    accept = request.headers.get('Accept')
-    response.set_header('Content-Type', determine_response_content_type(accept))
-    response.status = 200
+@app.route(path='/api/movies/<mid:re:.*>', method='GET')
+def callback(mid):
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
 
-    with open('movie_item.json') as json_data:
-        response_body = json.load(json_data)
-        json_data.close()
-    return json.dumps(response_body)
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.status = 200
+
+        with open('movie_item.json') as json_data:
+            response_body = json.load(json_data)
+            json_data.close()
+        return json.dumps(response_body)
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
 
 
 # movie item route - '^\/api\/movies\/.*'
 @app.route(path='/api/movies/<id:re:.*>', method='PUT')
-def callback(id):
-    # check accepts and content type
-    # content_type = request.headers.get('Content-Type')
-    accept = request.headers.get('Accept')
-    response.set_header('Content-Type', determine_response_content_type(accept))
-    response.status = 204
+def callback(mid):
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
 
-    with open('movie_item.json') as json_data:
-        response_body = json.load(json_data)
-        json_data.close()
-    return json.dumps(response_body)
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.status = 200
 
-    return json.dumps(response_body)
+        with open('movie_item.json') as json_data:
+            response_body = json.load(json_data)
+            json_data.close()
+        return json.dumps(response_body)
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
+
+# movie item route - '^\/api\/movies\/.*'
+@app.route(path='/api/movies/<id:re:.*>', method='DELETE')
+def callback(mid):
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
+
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.status = 200
+        response_body = {}
+        return json.dumps(response_body)
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
 
 # main
 run(app, host=HOST, port=PORT, debug=True)
