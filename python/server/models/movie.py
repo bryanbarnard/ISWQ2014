@@ -11,7 +11,7 @@ class Movie(Document):
     timeRequired = StringField(required=True)
     version = StringField(required=True)
     genre = StringField(required=True)
-    about= StringField(required=True)
+    about = StringField(required=True)
     datePublished = StringField(required=True)
     created_on = StringField()
     updated_on = StringField()
