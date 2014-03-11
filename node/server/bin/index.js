@@ -246,7 +246,6 @@ var sendAddMovieResponse = function (req, res) {
                     log.error(err);
                     sendErrorResponseHelper(req, res, 'Server Error', 500);
                 }
-
                 responseBody = '';
                 responseStatus = 201;
                 responseHeaders = { 'Location': base + 'movies/' + movie.sysid };
