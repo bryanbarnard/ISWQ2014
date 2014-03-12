@@ -97,38 +97,20 @@ def callback():
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
-        movie_collection = MoviesCollectionTemplateCJ(ROOT)
 
         # connect to mongodb
         mongoengine.connect('api')
 
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
+
         limit = 5
         for movie in Movie.objects[:limit]:
-            print movie.name
             movie_item = MovieItemCJ(ROOT, movie)
             movie_collection.items.append(movie_item.to_dict())
 
         response.status = 200
         response_body = movie_collection.to_json()
         return response_body
-
-    except Exception as e:
-        LOGGER.error('Unexpected exception ' + str(e))
-        response.status = 500
-        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
-        return response_body.to_json()
-
-
-# movies collection route - '^\/api\/movies$'
-@app.route(path='/api/movies', method='POST')
-def callback():
-    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
-
-    try:
-        accept = request.headers.get('Accept')
-        response.set_header('Content-Type', determine_response_content_type(accept))
-        response.set_header('Location', request.url + '/1234')
-        response.status = 201
 
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
@@ -145,12 +127,42 @@ def callback(mid):
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
-        response.status = 200
 
-        with open('movie_item.json') as json_data:
-            response_body = json.load(json_data)
-            json_data.close()
-        return json.dumps(response_body)
+        # connect to mongodb
+        mongoengine.connect('api')
+
+        movie = Movie.objects.get(sysid=mid)
+        movie_item = MovieItemCJ(ROOT, movie)
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
+        movie_collection.items.append(movie_item.to_dict())
+
+        response.status = 200
+        response_body = movie_collection.to_json()
+        return response_body
+
+    except DoesNotExist:
+        LOGGER.warning('Does not exist warning, cannot find movie with sysid: ' + mid)
+        response.status = 204
+        response_body = ErrorCJ(ROOT, 'Error Title', 204, 'Movie with id ' + mid + ' not found')
+        return response_body.to_json()
+
+    except Exception as e:
+        LOGGER.error('Unexpected exception ' + str(e))
+        response.status = 500
+        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        return response_body.to_json()
+
+
+# movie item route - '^\/api\/movies$'
+@app.route(path='/api/movies', method='POST')
+def callback():
+    LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
+
+    try:
+        accept = request.headers.get('Accept')
+        response.set_header('Content-Type', determine_response_content_type(accept))
+        response.set_header('Location', request.url + '/1234')
+        response.status = 201
 
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
@@ -179,6 +191,7 @@ def callback(mid):
         response.status = 500
         response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
         return response_body.to_json()
+
 
 # movie item route - '^\/api\/movies\/.*'
 @app.route(path='/api/movies/<id:re:.*>', method='DELETE')

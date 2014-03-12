@@ -15,4 +15,7 @@ class Movie(Document):
     datePublished = StringField(required=True)
     created_on = StringField()
     updated_on = StringField()
-    meta = {'collection': 'movies'}
+    meta = {
+        'collection': 'movies',
+        'ordering': ['-created_on']
+    }
