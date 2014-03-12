@@ -24,6 +24,7 @@ var MovieSchema = new Schema({
     updated_on: { type: Date }
     },
     //options
+    { versionKey: 'version_key' },
     { collection: 'movies' }
 );
 

@@ -13,8 +13,9 @@ class Movie(Document):
     genre = StringField(required=True)
     about = StringField(required=True)
     datePublished = StringField(required=True)
-    created_on = StringField()
-    updated_on = StringField()
+    created_on = DateTimeField()
+    updated_on = DateTimeField()
+    version_key = IntField(default=0)
     meta = {
         'collection': 'movies',
         'ordering': ['-created_on']
