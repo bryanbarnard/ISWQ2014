@@ -6,7 +6,7 @@ import uuid
 class Movie(Document):
     name = StringField(required=True)
     description = StringField(required=True)
-    sysid = StringField(required=True, default=str(uuid.uuid4()).replace("-", ""))
+    sysid = StringField(required=True)
     director = StringField()
     director_id = StringField()
     contentRating = StringField(required=True)
@@ -15,8 +15,8 @@ class Movie(Document):
     genre = StringField(required=True)
     about = StringField(required=True)
     datePublished = StringField(required=True)
-    created_on = DateTimeField(required=True, default=datetime.datetime.now)
-    updated_on = DateTimeField(required=True, default=datetime.datetime.now)
+    created_on = DateTimeField(required=True)
+    updated_on = DateTimeField(required=True)
     version_key = IntField(default=0)
     meta = {
         'collection': 'movies',

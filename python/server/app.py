@@ -203,20 +203,16 @@ def callback():
 
         # new movie
         movie = Movie()
+        movie.sysid = str(uuid.uuid4()).replace("-", "")
+        movie.created_on = datetime.datetime.now
+        movie.updated_on = datetime.datetime.now
         movie.decode(movie_dict)
-
-        # defaults
-        # movie.sysid = str(uuid.uuid4()).replace("-", "")
-        # movie.created_on = datetime.datetime.now
-        # movie.updated_on = datetime.datetime.now
-
-
-        # try to create record
         movie.save()
 
         # send the response
-        response.set_header('Location', request.url + movie.sysid)
+        response.set_header('Location', ROOT + 'movies/' + movie.sysid)
         response.status = 201
+        movie = None
         return
 
     except Exception as e:
