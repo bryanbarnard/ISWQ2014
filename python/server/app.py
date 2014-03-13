@@ -18,7 +18,6 @@ from templates.MovieItemCJ import MovieItemCJ
 from templates.MoviesCollectionTemplateCJ import MoviesCollectionTemplateCJ
 import mongoengine
 import datetime
-import uuid
 
 
 HOST = 'localhost'
@@ -114,6 +113,15 @@ def callback():
             movie_item = MovieItemCJ(ROOT, movie)
             movie_collection.items.append(movie_item.to_dict())
 
+        # TODO add come count logic here
+        link = LinkCJ(ROOT + 'movies', 'first', 'first')
+        movie_collection.links.append(link.to_dict())
+
+        link = LinkCJ(ROOT + 'movies?start=6', 'next', 'next')
+        movie_collection.links.append(link.to_dict())
+
+        # TODO paging next, prev, last
+
         response.status = 200
         response_body = movie_collection.to_json()
         return response_body
@@ -170,49 +178,44 @@ def callback():
 
         if 'application/json' not in request.headers.get(
                 'Content-Type') and 'application/vnd.collection+json' not in request.headers.get('Content-Type'):
-
             LOGGER.error('Unsupported media type sent')
             response.status = 415
-            response_body = ErrorCJ(ROOT, 'Invalid Content-Type', 415, 'application/json and application/vnd.collection+json supported')
+            response_body = ErrorCJ(ROOT, 'Invalid Content-Type', 415,
+                                    'application/json and application/vnd.collection+json supported')
             return response_body.to_json()
 
-
         request_json = json_loads(request._get_body_string())
-        if request_json:
-            # connect to mongodb and lookup movie with matching sysid
-            mongoengine.connect('api')
-            movie = Movie()
-            movie.sysid = str(uuid.uuid4()).replace("-", "")
-            movie.name = "bob"
-            movie.about = "new movie"
-            movie.contentRating = "r"
-            movie.datePublished = "1993-03-28T21:51:08.406Z"
-            movie.description = "a really good movie"
-            movie.director = "sam samson"
-            movie.genre = "comedy"
-            movie.timeRequired = "PT120M"
-            movie.created_on = datetime.datetime.now
-            movie.updated_on = datetime.datetime.now
-            movie.version = "1.0"
-            movie.save()
+        if not request_json:
+            raise Exception
 
-            print request_json
-            print len(request_json["template"]["data"])
+        # debug
+        # print request_json
+        # print len(request_json["template"]["data"])
 
+        # connect to mongodb
+        mongoengine.connect('api')
+
+        # TODO Need to note that we are only expecting a single item to be
+        # TODO created at any time
         movie_dict = dict()
         for item in request_json["template"]["data"]:
-            print item["name"] + " - " + item["value"]
             movie_dict[item["name"]] = item["value"]
 
-        # print request_json["template"]["data"][0]["name"] + ' - ' + request_json["template"]["data"][0]["value"]
-        # print request_json["template"]["data"][1]["name"] + ' - ' + request_json["template"]["data"][1]["value"]
-        # print request_json["template"]["data"][2]["name"] + ' - ' + request_json["template"]["data"][2]["value"]
-        # print request_json["template"]["data"][3]["name"] + ' - ' + request_json["template"]["data"][3]["value"]
-        # print request_json["template"]["data"][4]["name"] + ' - ' + request_json["template"]["data"][4]["value"]
-        # print request_json["template"]["data"][5]["name"] + ' - ' + request_json["template"]["data"][5]["value"]
-        # print request_json["template"]["data"][6]["name"] + ' - ' + request_json["template"]["data"][6]["value"]
+        # new movie
+        movie = Movie()
+        movie.decode(movie_dict)
 
-        response.set_header('Location', request.url + '/1234')
+        # defaults
+        # movie.sysid = str(uuid.uuid4()).replace("-", "")
+        # movie.created_on = datetime.datetime.now
+        # movie.updated_on = datetime.datetime.now
+
+
+        # try to create record
+        movie.save()
+
+        # send the response
+        response.set_header('Location', request.url + movie.sysid)
         response.status = 201
         return
 
