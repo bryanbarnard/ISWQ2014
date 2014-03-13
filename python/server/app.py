@@ -44,14 +44,14 @@ def determine_response_content_type(accept_header):
 # routes
 # default
 @app.route('/')
-def callback():
+def callback_default():
     LOGGER.info('ROUTE: /')
     abort(404, "not found")
 
 
 # billboard route - '^\/api$'
 @app.route(path='/api/', method='GET')
-def callback():
+def callback_get_billboard():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/')
     response.set_header('Date', DATETIMESTAMP)
 
@@ -95,7 +95,7 @@ def callback():
 
 # movies collection route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='GET')
-def callback():
+def callback_get_movies():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
     response.set_header('Date', DATETIMESTAMP)
 
@@ -135,7 +135,7 @@ def callback():
 
 # movie item route - '^\/api\/movies\/.*'
 @app.route(path='/api/movies/<mid:re:.+>', method='GET')
-def callback(mid):
+def callback_get_movie(mid):
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
     response.set_header('Date', DATETIMESTAMP)
 
@@ -168,7 +168,7 @@ def callback(mid):
 
 # movie item route - '^\/api\/movies$'
 @app.route(path='/api/movies', method='POST')
-def callback():
+def callback_post():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
     response.set_header('Date', DATETIMESTAMP)
 
@@ -190,7 +190,6 @@ def callback():
 
         # debug
         # print request_json
-        # print len(request_json["template"]["data"])
 
         # connect to mongodb
         mongoengine.connect('api')
@@ -223,20 +222,61 @@ def callback():
 
 
 # movie item route - '^\/api\/movies\/.*'
-@app.route(path='/api/movies/<id:re:.+>', method='PUT')
-def callback(mid):
+@app.route(path='/api/movies/<mid:re:.+>', method='PUT')
+def callback_put(mid):
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
     response.set_header('Date', DATETIMESTAMP)
 
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
-        response.status = 200
 
-        with open('movie_item.json') as json_data:
-            response_body = json.load(json_data)
-            json_data.close()
-        return json.dumps(response_body)
+        if 'application/json' not in request.headers.get(
+                'Content-Type') and 'application/vnd.collection+json' not in request.headers.get('Content-Type'):
+            LOGGER.error('Unsupported media type sent')
+            response.status = 415
+            response_body = ErrorCJ(ROOT, 'Invalid Content-Type', 415,
+                                    'application/json and application/vnd.collection+json supported')
+            return response_body.to_json()
+
+        request_json = json_loads(request._get_body_string())
+        if not request_json:
+            raise Exception
+
+        # debug
+        # print request_json
+
+        # connect to mongodb
+        mongoengine.connect('api')
+
+        movie = Movie.objects.get(sysid=mid)
+
+        # if we don't find a movie with this id
+        if not movie:
+            LOGGER.warn('movie.sysid' + mid + ' not found, unable to update')
+            response.status = 204
+            return
+
+        # TODO Cleanup
+        if "data" not in request_json["template"]:
+            print 'error data not found'
+
+        movie_dict = dict()
+        for item in request_json["template"]["data"]:
+            movie_dict[item["name"]] = item["value"]
+
+        movie.updated_on = datetime.datetime.now
+        movie.decode(movie_dict)
+        movie.save()
+
+        # testing
+        movie_item = MovieItemCJ(ROOT, movie)
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
+        movie_collection.items.append(movie_item.to_dict())
+
+        response.status = 200
+        response_body = movie_collection.to_json()
+        return response_body
 
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
@@ -247,7 +287,7 @@ def callback(mid):
 
 # movie item route - '^\/api\/movies\/.*'
 @app.route(path='/api/movies/<mid:re:.+>', method='DELETE')
-def callback(mid):
+def callback_delete(mid):
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies/' + mid)
     response.set_header('Date', DATETIMESTAMP)
 
