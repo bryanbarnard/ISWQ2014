@@ -99,6 +99,9 @@ def callback_get_movies():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
     response.set_header('Date', DATETIMESTAMP)
 
+    # todo use querystring for query
+    LOGGER.info(request.query_string)
+
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
