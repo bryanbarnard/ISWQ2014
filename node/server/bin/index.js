@@ -56,7 +56,7 @@ mongoose.connection.once('open', function callback() {
 });
 
 
-// Bootstrap models
+// load mongoose models
 fs.readdirSync('../models').forEach(function (file) {
     if (~file.indexOf('.js')) {
         require('../models/' + file);
@@ -99,7 +99,7 @@ fs.readdirSync('../models').forEach(function (file) {
  * Route Patterns
  */
 var reAPIBillboard = new RegExp('^\/api\/$', 'i');
-var reAPIListMovies = new RegExp('^\/api\/movies$', 'i');
+var reAPIListMovies = new RegExp('^\/api\/movies.*', 'i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*', 'i');
 
 
@@ -258,7 +258,10 @@ var sendAddMovieResponse = function (req, res) {
     });
 };
 
-
+/**
+ * DELETE an existing movie resource
+ * @param movieId
+ */
 var sendDeleteResponse = function (req, res, movieId) {
     try {
         mongoose.models.Movie.findOneAndRemove({sysid: movieId}, function (err, movie) {
@@ -278,7 +281,9 @@ var sendDeleteResponse = function (req, res, movieId) {
     }
 };
 
-
+/**
+ * GET collection movie resources
+ */
 var sendListResponseMovies = function (req, res) {
     try {
         responseCj = {};
@@ -311,7 +316,7 @@ var sendListResponseMovies = function (req, res) {
 
 
 /**
- * Update movie
+ * PUT (update) existing movie
  */
 var sendItemUpdateResponseMovies = function (req, res, movieId) {
     requestBody = '';
@@ -369,7 +374,7 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
 };
 
 /**
- *  get movie
+ *  GET movie individual movie resource
  */
 var sendItemResponseMovies = function (req, res, movieId) {
     try {
@@ -521,11 +526,11 @@ var renderMovieCollectionTemplate = function () {
  */
 var renderMovieCollectionQueries = function () {
     var query = {};
-
-    query = {};
-    query.rel = 'collection sort';
-    query.prompt = 'Sort by Name';
-    query.href = base + '/movies/sortbyname';
+    query.href = base + '/movies';
+    query.rel = 'search';
+    query.prompt = 'Movie-Search By Name';
+    query.name = 'movie-search';
+    query.data
     responseCj.collection.queries.push(query);
 };
 
@@ -610,6 +615,7 @@ var renderMovieCollectionItems = function (coll) {
     }
 };
 
+
 /**
  * Build and render MovieCollection Links
  */
@@ -627,6 +633,10 @@ var renderMovieCollectionLinks = function () {
     responseCj.collection.links.push(link);
 };
 
+
+/**
+ *  Render Billboard Response
+ */
 var renderBillboardCollection = function () {
     var links, linkItem;
     links = [];
@@ -662,6 +672,7 @@ var renderBillboardCollection = function () {
     responseCj.collection.links = links;
 };
 
+
 /**
  * Gen ID Helper Method
  */
@@ -670,6 +681,7 @@ var genId = function () {
     id = id.replace(/-/g, '');
     return id;
 }
+
 
 /**
  * Create Collection JSON Response Template
@@ -690,6 +702,6 @@ http.createServer(handler).listen(port);
 log.info('http server listening http://localhost:' + port + '/api/');
 
 /**
- * Sample Requests
+ * Sample CURL Requests
  */
 //curl -X POST -v -H "Content-Type: application/vnd.collection+json" -H "Connection: close" -H "Cache-Control: no-cache" -d '{"template":{"data":[{"name":"text","value":"testing"},{"name":"junk","value":""}]}}' http://localhost:8080/api/
