@@ -100,7 +100,7 @@ def callback_get_movies():
     response.set_header('Date', DATETIMESTAMP)
 
     # todo use querystring for query
-    LOGGER.info(request.query_string)
+    LOGGER.info('query_string:' + ' ' + request.query_string + ' ' + str(len(request.query)))
 
     try:
         accept = request.headers.get('Accept')
@@ -109,21 +109,47 @@ def callback_get_movies():
         # connect to mongodb
         mongoengine.connect('api')
 
-        movie_collection = MoviesCollectionTemplateCJ(ROOT)
 
-        limit = 5
-        for movie in Movie.objects[:limit]:
+        # handle querystring parameters
+        limit = 5  # default
+        if request.query.limit:
+            limit = int(request.query.limit)
+
+        offset = 0  # default
+        if request.query.offset:
+            offset = int(request.query.offset)
+
+        page_start = offset
+        page_end = offset + limit
+
+        # LOGGER.info('page_start:' + str(page_start) + ' ' + 'page_end:' + str(page_end))
+
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
+        for movie in Movie.objects[page_start:page_end].order_by('-created_on'):
             movie_item = MovieItemCJ(ROOT, movie)
             movie_collection.items.append(movie_item.to_dict())
 
-        # TODO add come count logic here
+        movie_collection.href = ROOT + 'movies?offset=' + str(offset) + '&limit=' + str(limit)
+
+        # first page of movies
         link = LinkCJ(ROOT + 'movies', 'first', 'first')
         movie_collection.links.append(link.to_dict())
 
-        link = LinkCJ(ROOT + 'movies?start=6', 'next', 'next')
+        #next page of movies
+        link = LinkCJ(ROOT + 'movies?offset=' + str(offset + limit) + '&limit=' + str(limit), 'next', 'next')
         movie_collection.links.append(link.to_dict())
 
-        # TODO paging next, prev, last
+        #prev page of movies
+        if offset < limit:
+            link = LinkCJ(ROOT + 'movies', 'prev', 'prev')
+            movie_collection.links.append(link.to_dict())
+        else:
+            link = LinkCJ(ROOT + 'movies?offset=' + str(offset - limit) + '&limit=' + str(limit), 'prev', 'prev')
+            movie_collection.links.append(link.to_dict())
+
+        #last page
+        link = LinkCJ(ROOT + 'movies?offset=' + str(len(Movie.objects) - limit) + '&limit=' + str(limit), 'last', 'last')
+        movie_collection.links.append(link.to_dict())
 
         response.status = 200
         response_body = movie_collection.to_json()

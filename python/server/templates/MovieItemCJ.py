@@ -17,20 +17,24 @@ class MovieItemCJ:
         self.data.append(
             DataCJ.create("timeRequired", movie.timeRequired, "time required to view this movie, aka duration"))
         self.data.append(DataCJ.create("contentRating", movie.contentRating, "rating of the movie"))
+        self.data.append(DataCJ.create("created", str(movie.created_on), "rating of the movie"))
+        self.data.append(DataCJ.create("updated", str(movie.updated_on), "rating of the movie"))
 
         self.links = list()
 
-        link = {
-            'href': root + 'persons/1234567774454545',
-            'prompt': 'director of the movies',
-            'rel': 'director',
-            'render': 'link'
-        }
-        self.links.append(link)
+        if movie.director:
+            link = {
+                'href': root + 'persons/1234',
+                'prompt': 'director of the movies',
+                'name': movie.director,
+                'rel': 'director',
+                'render': 'link'
+            }
+            self.links.append(link)
 
     def to_dict(self):
         return {
             'href': self.href,
-            'data': self.data
-            # 'links': self.links
+            'data': self.data,
+            'links': self.links
         }
