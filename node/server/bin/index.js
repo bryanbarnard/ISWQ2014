@@ -552,14 +552,16 @@ var renderMovieCollectionItems = function (coll) {
             item.data = [];
             item.links = [];
 
-            //linkItem
-            linkItem = {};
-            linkItem.name = coll[i].director;
-            linkItem.rel = 'director';
-            linkItem.prompt = 'director of the movie';
-            linkItem.href = base + 'persons/' + coll[i].director_id;
-            linkItem.render = 'link';
-            item.links.push(linkItem);
+            //conditional linkItem
+            if (coll[i].director) {
+                linkItem = {};
+                linkItem.name = coll[i].director;
+                linkItem.rel = 'director';
+                linkItem.prompt = 'director of the movie';
+                linkItem.href = base + 'persons/1234'
+                linkItem.render = 'link';
+                item.links.push(linkItem);
+            }
 
             //data
             dataItem = {};
@@ -608,6 +610,18 @@ var renderMovieCollectionItems = function (coll) {
             dataItem.name = 'contentRating';
             dataItem.value = coll[i].contentRating;
             dataItem.prompt = 'rating of the movie';
+            item.data.push(dataItem);
+
+            dataItem = {};
+            dataItem.name = 'created';
+            dataItem.value = coll[i].created_on.toDateString();
+            dataItem.prompt = 'record created';
+            item.data.push(dataItem);
+
+            dataItem = {};
+            dataItem.name = 'updated';
+            dataItem.value = coll[i].updated_on.toDateString();
+            dataItem.prompt = 'record last updated';
             item.data.push(dataItem);
 
             responseCj.collection.items.push(item);
