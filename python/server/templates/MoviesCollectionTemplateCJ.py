@@ -22,15 +22,9 @@ class MoviesCollectionTemplateCJ:
             'rel': 'search',
             'name': 'movie-search',
             'prompt': 'Movie-Search By Name',
-            'data': [{
-                         'name': 'name',
-                         'prompt': 'Name'
-                     }]
+            'data': [dict(name='name', prompt='Name')]
         }
-
         self.queries.append(movie_name_query)
-
-
 
     def to_json(self):
         collection = OrderedDict([
