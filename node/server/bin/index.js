@@ -530,7 +530,7 @@ var renderMovieCollectionQueries = function () {
     query.rel = 'search';
     query.prompt = 'Movie-Search By Name';
     query.name = 'movie-search';
-    query.data
+    query.data = {'name': 'name', 'prompt': 'prompt'};
     responseCj.collection.queries.push(query);
 };
 
