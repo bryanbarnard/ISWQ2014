@@ -17,8 +17,8 @@ class MovieItemCJ:
         self.data.append(
             DataCJ.create("timeRequired", movie.timeRequired, "time required to view this movie, aka duration"))
         self.data.append(DataCJ.create("contentRating", movie.contentRating, "rating of the movie"))
-        self.data.append(DataCJ.create("created", str(movie.created_on), "rating of the movie"))
-        self.data.append(DataCJ.create("updated", str(movie.updated_on), "rating of the movie"))
+        self.data.append(DataCJ.create("created", str(movie.created_on), "record created"))
+        self.data.append(DataCJ.create("updated", str(movie.updated_on), "record last updated"))
 
         self.links = list()
 
