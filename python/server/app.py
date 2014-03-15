@@ -99,9 +99,6 @@ def callback_get_movies():
     LOGGER.info('Logging Request: METHOD: ' + request.method + ' => ROUTE: /api/movies')
     response.set_header('Date', DATETIMESTAMP)
 
-    # todo use querystring for query
-    LOGGER.info('query_string:' + ' ' + request.query_string + ' ' + str(len(request.query)))
-
     try:
         accept = request.headers.get('Accept')
         response.set_header('Content-Type', determine_response_content_type(accept))
@@ -109,47 +106,85 @@ def callback_get_movies():
         # connect to mongodb
         mongoengine.connect('api')
 
+        # default template
+        movie_collection = MoviesCollectionTemplateCJ(ROOT)
 
-        # handle querystring parameters
-        limit = 5  # default
+        limit = 5  # default limit
         if request.query.limit:
             limit = int(request.query.limit)
 
-        offset = 0  # default
+        offset = 0  # default offset
         if request.query.offset:
             offset = int(request.query.offset)
 
         page_start = offset
         page_end = offset + limit
 
-        # LOGGER.info('page_start:' + str(page_start) + ' ' + 'page_end:' + str(page_end))
+        if request.query.name:
+            movies = Movie.objects(name__contains=request.query.name).order_by('-created_on')
+        else:
+            movies = Movie.objects.order_by('-created_on')
 
-        movie_collection = MoviesCollectionTemplateCJ(ROOT)
-        for movie in Movie.objects[page_start:page_end].order_by('-created_on'):
+        for movie in movies[page_start:page_end]:
             movie_item = MovieItemCJ(ROOT, movie)
             movie_collection.items.append(movie_item.to_dict())
 
-        movie_collection.href = ROOT + 'movies?offset=' + str(offset) + '&limit=' + str(limit)
+        if request.query.name:
+            #href
+            movie_collection.href = ROOT + 'movies?name=' + request.query.name + '&offset=' + str(
+                offset) + '&limit=' + str(limit)
 
-        # first page of movies
-        link = LinkCJ(ROOT + 'movies', 'first', 'first')
-        movie_collection.links.append(link.to_dict())
+            # first page of movies
+            link = LinkCJ(ROOT + 'movies?name=' + request.query.name, 'first', 'first page of results')
+            movie_collection.links.append(link.to_dict())
 
-        #next page of movies
-        link = LinkCJ(ROOT + 'movies?offset=' + str(offset + limit) + '&limit=' + str(limit), 'next', 'next')
-        movie_collection.links.append(link.to_dict())
+            #next page of movies
+            link = LinkCJ(
+                ROOT + 'movies?name=' + request.query.name + '&offset=' + str(offset + limit) + '&limit=' + str(limit),
+                'next', 'immediate next page results')
+            movie_collection.links.append(link.to_dict())
 
-        #prev page of movies
-        if offset < limit:
-            link = LinkCJ(ROOT + 'movies', 'prev', 'prev')
+            #prev page of movies
+            if offset < limit:
+                link = LinkCJ(ROOT + 'movies?name=' + request.query.name, 'previous',
+                              'immediate previous page of results')
+                movie_collection.links.append(link.to_dict())
+            else:
+                link = LinkCJ(
+                    ROOT + 'movies?name=' + request.query.name + '&offset=' + str(offset - limit) + '&limit=' + str(
+                        limit), 'previous', 'immediate previous page of results')
+                movie_collection.links.append(link.to_dict())
+
+            #last page
+            link = LinkCJ(ROOT + 'movies?name=' + request.query.name + '&offset=' + str(
+                len(Movie.objects) - limit) + '&limit=' + str(limit), 'last', 'last page of results')
             movie_collection.links.append(link.to_dict())
         else:
-            link = LinkCJ(ROOT + 'movies?offset=' + str(offset - limit) + '&limit=' + str(limit), 'prev', 'prev')
+            # href
+            movie_collection.href = ROOT + 'movies?offset=' + str(offset) + '&limit=' + str(limit)
+
+            # first page of movies
+            link = LinkCJ(ROOT + 'movies', 'first', 'first page of results')
             movie_collection.links.append(link.to_dict())
 
-        #last page
-        link = LinkCJ(ROOT + 'movies?offset=' + str(len(Movie.objects) - limit) + '&limit=' + str(limit), 'last', 'last')
-        movie_collection.links.append(link.to_dict())
+            #next page of movies
+            link = LinkCJ(ROOT + 'movies?offset=' + str(offset + limit) + '&limit=' + str(limit), 'next',
+                          'immediate next page results')
+            movie_collection.links.append(link.to_dict())
+
+            #prev page of movies
+            if offset < limit:
+                link = LinkCJ(ROOT + 'movies', 'previous', 'immediate previous page of results')
+                movie_collection.links.append(link.to_dict())
+            else:
+                link = LinkCJ(ROOT + 'movies?offset=' + str(offset - limit) + '&limit=' + str(limit), 'previous',
+                              'immediate previous page of results')
+                movie_collection.links.append(link.to_dict())
+
+            #last page
+            link = LinkCJ(ROOT + 'movies?offset=' + str(len(Movie.objects) - limit) + '&limit=' + str(limit), 'last',
+                          'last page of results')
+            movie_collection.links.append(link.to_dict())
 
         response.status = 200
         response_body = movie_collection.to_json()

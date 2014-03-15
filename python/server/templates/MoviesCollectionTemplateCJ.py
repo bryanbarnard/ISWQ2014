@@ -15,6 +15,23 @@ class MoviesCollectionTemplateCJ:
         self.queries = []
         self.items = []
 
+
+        #queries
+        movie_name_query = {
+            'href': root + 'movies',
+            'rel': 'search',
+            'name': 'movie-search',
+            'prompt': 'Movie-Search By Name',
+            'data': [{
+                         'name': 'name',
+                         'prompt': 'Name'
+                     }]
+        }
+
+        self.queries.append(movie_name_query)
+
+
+
     def to_json(self):
         collection = OrderedDict([
             ('href', self.href),
