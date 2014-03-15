@@ -287,11 +287,16 @@ var sendDeleteResponse = function (req, res, movieId) {
 var sendListResponseMovies = function (req, res) {
     try {
         responseCj = {};
-        mongoose.models.Movie.find(function (err, movies) {
-            if (err) {
-                log.error(err);
-                sendErrorResponseHelper(req, res, 'Server Error', 500);
-            }
+//        mongoose.models.Movie.find(function (err, movies) {
+//            if (err) {
+//                log.error(err);
+//                sendErrorResponseHelper(req, res, 'Server Error', 500);
+//            }
+
+        var limit = 1;
+        var movies = mongoose.models.Movie.find().limit(limit).sort('-created_on');
+
+        movies.exec(function (err, movies) {
 
             if (movies && movies.length > 0) {
                 createResponseCjTemplate();
@@ -304,7 +309,7 @@ var sendListResponseMovies = function (req, res) {
                 responseHeaders = {
                     'Content-Type': contentType,
                     'Content-Length': Buffer.byteLength(responseBody)
-                }
+                };
                 responseStatus = 200;
                 sendResponse(req, res, responseStatus, responseHeaders, responseBody);
             }
