@@ -71,9 +71,6 @@ def callback_get_billboard():
         link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
         links.append(link.to_dict())
 
-        link = LinkCJ(ROOT + 'persons', 'Persons Collection', 'persons')
-        links.append(link.to_dict())
-
         link = LinkCJ(ROOT + 'docs', 'API Documentation', 'documentation')
         links.append(link.to_dict())
 
@@ -89,7 +86,7 @@ def callback_get_billboard():
     except Exception as e:
         LOGGER.error('Unexpected exception ' + str(e))
         response.status = 500
-        response_body = ErrorCJ(ROOT, 'Error Title', 500, str(e))
+        response_body = ErrorCJ(ROOT, 'Server Error', 500, str(e))
         return response_body.to_json()
 
 
