@@ -98,6 +98,53 @@
                 -H Cache-Control:no-cache \
             </pre>
         <p></p>
+        <h2>Sample CURL Requests - Python API</h2>
+            <pre class="embedcurl" width="100%" title="Get BILLBOARD">curl -v http://iswq2014.bryanbarnard.com:1338/api/ \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" width="100%" title="Get Movie Resource Collection">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" width="100%" title="Get Movie Resource Collection, search by name">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies?name={movieName} \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" width="100%" title="Get Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies/{movieid} \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" width="100%" title="Create a Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies \
+                -X POST \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json' \
+                -H 'Content-Type: application/vnd.collection+json' \
+                -d '{ "template": { "data": [ { "name": "name", "value": "Fletch" }, { "name": "description", "value": "Chevy Chase as worlds best detective." }, { "name": "datePublished", "value": "1986-03-28T21:51:08.406Z" }, { "name": "about", "value": "Cheve Chase as LA Detective" }, { "name": "genre", "value": "comedy" }, { "name": "version", "value": "1.0" }, { "name": "timeRequired", "value": "PT100M" }, { "name": "contentRating", "value": "r" } ] } }'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" width="100%" title="Modify a Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies/{movieid}
+                -X PUT \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json' \
+                -H 'Content-Type: application/vnd.collection+json' \
+                -d '{ "template": { "data": [ { "name": "name", "value": "Fletch Lives" }, { "name": "description", "value": "Fletch, again" }, { "name": "datePublished", "value": "1992-03-28T21:51:08.406Z" }, { "name": "about", "value": "Chevy Chase as LA Detective" }, { "name": "genre", "value": "comedy" }, { "name": "version", "value": "1.0" }, { "name": "timeRequired", "value": "PT140M" }, { "name": "contentRating", "value": "r" } ] } }'
+            </pre>
+        <p></p>
+            <pre class="embedcurl"  width="100%" title="Delete a Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1338/api/movies/{movieid}
+                -X DELETE \
+                -H 'Connection: close' \
+                -H Cache-Control:no-cache \
+            </pre>
+        <p></p>
     </div>
     <div id="tests">
     </div>
