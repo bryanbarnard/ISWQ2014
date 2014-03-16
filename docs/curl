@@ -1,30 +1,49 @@
 ## Curl Commands Based Tests ##
 
-# HEAD ROOT
-curl -iL http://localhost:3000 \
- -X HEAD \
- -H 'Accept: text/plain' \
- -H 'Content-Type: text/plain' \
- -H 'Connection: close'
-
-# GET ROOT
-curl -iL http://localhost:3000 \
- -X GET \
- -H 'Accept: text/plain' \
- -H 'Content-Type: text/plain' \
- -H 'Connection: close'
-
 # GET Invalid URL
-curl -iL http://localhost:3000/test \
+curl -iL http://localhost:1337/test \
  -X GET \
  -H 'Accept: text/plain' \
  -H 'Content-Type: text/plain' \
  -H 'Connection: close'
 
 # GET ROOT Custom Content Type
-curl -iL http://localhost:3000 \
+curl -iL http://localhost:1337 \
 -X GET \
 -H 'Connection: close' \
 -H 'Content-Type: application/vnd.collection+json'
 
-# New Entry for Test Post Request
+# POST ROOT Custom Content Type, new Movie Resource
+curl -v http://iswq2014.bryanbarnard.com:1337/api/movies
+-X POST \
+-H Accept:application/vnd.collection+json \
+-H Content-Type:application/vnd.collection+json \
+-H Cache-Control:no-cache \
+-d '{ "template": { "data": [ { "name": "name", "value": "So I Married An Axe Murderer" }, { "name": "description", "value": "A San Francisco poet who fears commitment has a girlfriend who he suspects may not be who she appears." }, { "name": "datePublished", "value": "1993-03-28T21:51:08.406Z" }, { "name": "about", "value": "Cult Classic Michael Myers" }, { "name": "genre", "value": "comedy" }, { "name": "version", "value": "1.0" }, { "name": "timeRequired", "value": "PT120M" }, { "name": "contentRating", "value": "r" } ] } }'
+
+# PUT ROOT/{movieid} Custom Content Type, modify Movie Resource
+curl -v http://iswq2014.bryanbarnard.com:1337/api/movies/dc9f20f915f643fe951c0c7a87be0131 \
+-X PUT \
+-H Accept:application/vnd.collection+json \
+-H Content-Type:application/vnd.collection+json \
+-H Cache-Control:no-cache \
+-d '{ "template": { "data": [ { "name": "name", "value": "Fletch Lives" }, { "name": "description", "value": "Fletch, again" }, { "name": "datePublished", "value": "1992-03-28T21:51:08.406Z" }, { "name": "about", "value": "Chevy Chase as LA Detective" }, { "name": "genre", "value": "comedy" }, { "name": "version", "value": "1.0" }, { "name": "timeRequired", "value": "PT140M" }, { "name": "contentRating", "value": "r" } ] } }'
+
+# GET Movie Resource Collection
+curl -v http://iswq2014.bryanbarnard.com:1337/api/movies \
+-X GET \
+-H Accept:application/vnd.collection+json \
+-H Content-Type:application/vnd.collection+json \
+-H Cache-Control:no-cache \
+
+# GET Movie Resource Collection Filter by Name
+curl -v http://iswq2014.bryanbarnard.com:1337/api/movies?name=blue \
+-X GET \
+-H Accept:application/vnd.collection+json \
+-H Content-Type:application/vnd.collection+json \
+-H Cache-Control:no-cache \
+
+# DELETE Movie Resource  ROOT/{movieid} Custom Content Type
+curl -X DELETE \
+-v http://iswq2014.bryanbarnard.com:1337/api/movies/dc9f20f915f643fe951c0c7a87be0131 \
+-H Cache-Control:no-cache \
