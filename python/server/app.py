@@ -21,7 +21,7 @@ import datetime
 
 
 HOST = 'localhost'
-PORT = 1337
+PORT = 1338
 PATH = '/api/'
 BASE = 'http://'
 ROOT = BASE + HOST + ':' + str(PORT) + PATH
