@@ -1,12 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ISWQ2014</title>
+    <title>ISWQ2014</title>
 </head>
 <body>
-<h1>
-ISWQ2014 API Documentation
-</h1>
-<p>This is documentation for the sample movie API created for my Independent Study Winter Quarter 2014 at DePaul University</p>
+<div id="introduction">
+    <h1>
+        ISWQ2014 API Documentation
+    </h1>
+
+    <p>This is documentation for the sample movie API created for my Independent Study Winter Quarter 2014 at DePaul
+        University</p>
+</div>
+<section>
+    <div id="details">
+        <h2>API Details</h2>
+        <p><strong>Endpoint:</strong></p>
+        <ul>
+            <li>NODE.JS Implementation: http://iswq2014.bryanbarnard.com:1337/api/</li>
+            <li>Python Implementation Implementation: http://iswq2014.bryanbarnard.com:1338/api/</li>
+        </ul>
+        <p><strong>Supported Content Types:</strong></p>
+        <ul>
+            <li><a href="http://amundsen.com/media-types/collection/format/">application/vnd.collection+json</a>: Collection+JSON Hypermedia Content Type</li>
+            <li><a href="https://www.ietf.org/rfc/rfc4627.txt">application/json</a>: JSON provided for ease of use in browser, not a Hypermedia Content Type </li>
+        </ul>
+    </div>
+    <div id="operations">
+        <h2>Operations</h2>
+        <ul>
+            <li>
+                <span>GET</span>&nbsp;<span>Get Billboard</span>&nbsp;<span>/api/</span>&nbsp;<span>200</span></li>
+            <li>
+                <span>GET</span>&nbsp;<span>Get Movie Resource Collection</span>&nbsp;<span>/api/movies</span>&nbsp;<span>200</span>
+            </li>
+            <li>
+                <span>POST</span>&nbsp;<span>Create Movie Resource</span>&nbsp;<span>/api/movies</span>&nbsp;<span>200</span>
+            </li>
+            <li>
+                <span>GET</span>&nbsp;<span>Get Movie Resource</span>&nbsp;<span>/api/movies/{movieid}</span>&nbsp;<span>201</span>
+            </li>
+            <li>
+                <span>PUT</span>&nbsp;<span>Modify Movie Resource</span>&nbsp;<span>/api/movies/{movieid}</span>&nbsp;<span>200</span>
+            </li>
+            <li>
+                <span>DELETE</span>&nbsp;<span>Delete Movie Resource</span>&nbsp;<span>/api/movies/{movieid}</span>&nbsp;<span>204</span>
+            </li>
+        </ul>
+    </div>
+</section>
+<section>
+    <div id="sample_request">
+        <h2>Sample CURL Requests - NODEJS API</h2>
+            <pre class="embedcurl" title="Get BILLBOARD">curl -v http://iswq2014.bryanbarnard.com:1337/api/ \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" title="Get Movie Resource Collection">curl -v http://iswq2014.bryanbarnard.com:1337/api/movies \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" title="Get Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1337/api/movies/cfc00c95fee147a9870f4a18036045f6 \
+                -X GET \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+            </pre>
+        <p></p>
+            <pre class="embedcurl" title="Create a Movie Resource">curl -v http://iswq2014.bryanbarnard.com:1337/api/movies \
+                -X POST \
+                -H 'Connection: close' \
+                -H 'Accept: application/vnd.collection+json'
+                -H 'Content-Type: application/vnd.collection+json'
+                -D
+            </pre>
+    </div>
+    <div id="tests">
+    </div>
+</section>
+
+<script src="https://www.embedcurl.com/embedcurl.min.js" async></script>
 </body>
 </html>
