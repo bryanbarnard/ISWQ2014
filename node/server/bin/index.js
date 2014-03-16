@@ -5,12 +5,8 @@ var crypto = require('crypto');
 var uuid = require('node-uuid');
 var querystring = require('querystring');
 var mongoose = require('mongoose');
-var fs = require('fs');
 var bunyan = require('bunyan');
-//var movieCollectionStatic = require('./movie_collection.json');
-//var movieItemStatic = require('./movie_item.json');
-//var billboardResponseStatic = require('./billboard.json');
-
+var fs = require('fs');
 
 //variables
 var port = (process.env.PORT || 1337);
@@ -35,19 +31,19 @@ var log = bunyan.createLogger({name: "api"});
 var connect = function () {
     var options = { server: { socketOptions: { keepAlive: 1 } } }
     mongoose.connect('mongodb://localhost/api', options)
-}
+};
 connect();
 
 
 // Error handler
 mongoose.connection.on('error', function (err) {
-    log.info(err)
+    log.info(err);
 });
 
 
 // Reconnect when closed
 mongoose.connection.on('disconnected', function () {
-    connect()
+    connect();
 });
 
 
@@ -63,37 +59,6 @@ fs.readdirSync('../models').forEach(function (file) {
         require('../models/' + file);
     }
 });
-
-
-/**
- * Lets Run Some Tests with Mongoose
- */
-// create and save movie
-/*
- var instance = new mongoose.models.Movie({ name: 'Red Dawn'});
- log.info('instance.name: ' + instance.name);
- */
-
-//instance.save(function (err, instance) {
-//    if (err) {
-//        return console.error(err);
-//    }
-//    console.log('instance.name: ' + instance.name + ' saved');
-//});
-
-//get movies from DB
-/*
- mongoose.models.Movie.find(function (err, movies) {
- if (err) {
- log.error(err);
- return console.error(err);
- }
-
- if (movies && movies.length > 0) {
- log.info({movies: movies});
- }
- });
- */
 
 
 /**
@@ -206,7 +171,7 @@ var sendBillboardResponse = function (req, res) {
         responseHeaders = {
             'Content-Type': contentType,
             'Content-Length': Buffer.byteLength(responseBody)
-        }
+        };
         responseStatus = 200;
 
         sendResponse(req, res, responseStatus, responseHeaders, responseBody);
@@ -272,7 +237,7 @@ var sendDeleteResponse = function (req, res, movieId) {
                 sendErrorResponseHelper(req, res, 'Server Error', 500);
             }
             log.info('movie ' + movieId + ' - ' + movie.name + ' deleted from db');
-        })
+        });
 
         responseBody = '';
         responseHeaders = {};
@@ -287,44 +252,152 @@ var sendDeleteResponse = function (req, res, movieId) {
  * GET collection movie resources
  */
 var sendListResponseMovies = function (req, res) {
-    try {
-        responseCj = {};
+    var movies = null;
+    var offset = null;
+    var limit = null;
+    var pagestart = null;
+    var pageend = null;
+    responseCj = {}; //default template
 
-        var offset = 0;
-        var limit = 5; //default page size
-        var movies = null;
+    try {
+
+        limit = 5; // default limit
+        if (queryData.limit) {
+            limit = parseInt(queryData.limit);
+        }
+
+        offset = 0; // default offset
+        if (queryData.offset) {
+            offset = parseInt(queryData.offset);
+        }
+
+        pagestart = offset;
+        pageend = offset + limit;
 
         //define query
         if (queryData.name) {
-            log.info('queryData.name: ' + queryData.name)
-            movies = mongoose.models.Movie.find({name: new RegExp(queryData.name, 'i')}).sort('-created_on').skip(offset).limit(limit);
+            log.info('queryData.name: ' + queryData.name);
+            movies = mongoose.models.Movie.find({name: new RegExp(queryData.name, 'i')}).sort('-created_on');
         } else {
-            movies = mongoose.models.Movie.find().sort('-created_on').skip(offset).limit(limit);
+            movies = mongoose.models.Movie.find().sort('-created_on');
         }
 
-        //execute query
+        createResponseCjTemplate();
+        renderMovieCollectionLinks();
+        renderMovieCollectionQueries();
+        renderMovieCollectionTemplate();
+
+        //execute query and handle response
         movies.exec(function (err, movies) {
             if (err) {
                 log.error(err);
                 sendErrorResponseHelper(req, res, 'Server Error', 500);
             }
 
-            log.info('result count: ' + movies.length);
-            if (movies && movies.length > 0) {
-                createResponseCjTemplate();
-                renderMovieCollectionLinks();
-                renderMovieCollectionItems(movies);
-                renderMovieCollectionQueries();
-                renderMovieCollectionTemplate();
+            log.info(movies.length + ' records found matching query passed to mongoDB');
 
-                responseBody = JSON.stringify(responseCj);
-                responseHeaders = {
-                    'Content-Type': contentType,
-                    'Content-Length': Buffer.byteLength(responseBody)
-                };
-                responseStatus = 200;
-                sendResponse(req, res, responseStatus, responseHeaders, responseBody);
+            if (movies && movies.length > 0) {
+                log.info('pagestart: ' + pagestart + ' pageend: ' + pageend);
+                renderMovieCollectionItems(movies.slice(pagestart, pageend));
+            } else {
+                responseCj.collection.items = [];
             }
+
+            if (queryData.name) {
+
+                //href
+                responseCj.collection.href = base + 'movies?name=' + queryData.name + '&offset=' + offset.toString() +
+                    '&limit=' + limit.toString();
+
+                // first page of movies
+                var link = {};
+                link.href = base + 'movies?name=' + queryData.name;
+                link.rel = 'first';
+                link.prompt = 'first page of results';
+                responseCj.collection.links.push(link);
+
+                // next page of movies
+                if(pageend < movies.length) {
+                    var link = {};
+                    link.href = base + 'movies?name=' + queryData.name + '&offset=' + (offset + limit).toString() +
+                        '&limit=' + limit.toString();
+                    link.rel = 'next';
+                    link.prompt = 'immediate next page results';
+                    responseCj.collection.links.push(link);
+                }
+
+                // prev page of movies
+                var link = {};
+                if (offset < limit) {
+                    link.href = base + 'movies?name=' + queryData.name;
+                } else {
+                    link.href = base + 'movies?name=' + queryData.name + '&offset=' + (offset - limit).toString() +
+                        '&limit=' + limit.toString();
+                }
+
+                link.rel = 'previous';
+                link.prompt = 'immediate previous page results';
+                responseCj.collection.links.push(link);
+
+                //last
+                var link = {};
+                link.href = base + 'movies?name=' + queryData.name + '&offset=' + (movies.length - limit).toString() +
+                    '&limit=' + limit.toString();
+                link.rel = 'last';
+                link.prompt = 'last page of results';
+                responseCj.collection.links.push(link);
+
+            } else {
+
+                //href
+                responseCj.collection.href = base + 'movies?offset=' + offset.toString() +
+                    '&limit=' + limit.toString();
+
+                // first page of movies
+                var link = {};
+                link.href = base + 'movies';
+                link.rel = 'first';
+                link.prompt = 'first page of results';
+                responseCj.collection.links.push(link);
+
+                // next page of movies
+                if(pageend < movies.length) {
+                    var link = {};
+                    link.href = base + 'movies?offset=' + (offset + limit).toString() +
+                        '&limit=' + limit.toString();
+                    link.rel = 'next';
+                    link.prompt = 'immediate next page results';
+                    responseCj.collection.links.push(link);
+                }
+
+                // prev page of movies
+                var link = {};
+                if (offset < limit) {
+                    link.href = base + 'movies';
+                } else {
+                    link.href = base + 'movies?offset=' + (offset - limit).toString() +
+                        '&limit=' + limit.toString();
+                }
+                link.rel = 'previous';
+                link.prompt = 'immediate previous page results';
+                responseCj.collection.links.push(link);
+
+                //last
+                var link = {};
+                link.href = base + 'movies?offset=' + (movies.length - limit).toString() +
+                    '&limit=' + limit.toString();
+                link.rel = 'last';
+                link.prompt = 'last page of results';
+                responseCj.collection.links.push(link);
+            }
+
+            responseBody = JSON.stringify(responseCj);
+            responseHeaders = {
+                'Content-Type': contentType,
+                'Content-Length': Buffer.byteLength(responseBody)
+            };
+            responseStatus = 200;
+            sendResponse(req, res, responseStatus, responseHeaders, responseBody);
         });
     } catch (ex) {
         sendErrorResponseHelper(req, res, 'Server Error', 500);
@@ -547,7 +620,7 @@ var renderMovieCollectionQueries = function () {
     query.rel = 'search';
     query.prompt = 'Movie-Search By Name';
     query.name = 'movie-search';
-    query.data = {'name': 'name', 'prompt': 'prompt'};
+    query.data = {'name': 'name', 'prompt': 'Name'};
     responseCj.collection.queries.push(query);
 };
 
@@ -556,6 +629,7 @@ var renderMovieCollectionQueries = function () {
  */
 var renderMovieCollectionItems = function (coll) {
 
+    log.info('coll.length: ' + coll.length);
     var item, dataItem, linkItem;
     responseCj.collection.items = [];
 
@@ -631,13 +705,13 @@ var renderMovieCollectionItems = function (coll) {
 
             dataItem = {};
             dataItem.name = 'created';
-            dataItem.value = coll[i].created_on.toDateString();
+            dataItem.value = coll[i].created_on.toISOString();
             dataItem.prompt = 'record created';
             item.data.push(dataItem);
 
             dataItem = {};
             dataItem.name = 'updated';
-            dataItem.value = coll[i].updated_on.toDateString();
+            dataItem.value = coll[i].updated_on.toISOString();
             dataItem.prompt = 'record last updated';
             item.data.push(dataItem);
 
@@ -648,15 +722,10 @@ var renderMovieCollectionItems = function (coll) {
 
 
 /**
- * Build and render MovieCollection Links
+ * Build and render Default MovieCollection Links
  */
 var renderMovieCollectionLinks = function () {
     var link = {};
-
-    link = {};
-    link.href = base + 'movies';
-    link.rel = 'home';
-    responseCj.collection.links.push(link);
 
     link = {};
     link.href = base + 'movie-alps.xml';
@@ -678,7 +747,7 @@ var renderBillboardCollection = function () {
     responseCj.collection.href = base;
 
     linkItem = {};
-    linkItem.href = base + "movie-apls.xml";
+    linkItem.href = base + "movie-alps.xml";
     linkItem.rel = "profile";
     links.push(linkItem);
 
@@ -686,12 +755,6 @@ var renderBillboardCollection = function () {
     linkItem.href = base + "movies";
     linkItem.prompt = "Movies Collection"
     linkItem.rel = "movies";
-    links.push(linkItem);
-
-    linkItem = {};
-    linkItem.href = base + "persons";
-    linkItem.prompt = "Persons Collection"
-    linkItem.rel = "persons";
     links.push(linkItem);
 
     linkItem = {};
