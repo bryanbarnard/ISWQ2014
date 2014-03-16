@@ -6,7 +6,7 @@
 <body>
 <div id="introduction">
     <h1>
-        ISWQ2014 API Documentation
+        ISWQ2014 - Hypermedia API Documentation
     </h1>
 
     <p>This is documentation for the sample movie API created for my Independent Study Winter Quarter 2014 at DePaul
@@ -75,8 +75,12 @@
                 -H 'Connection: close' \
                 -H 'Accept: application/vnd.collection+json'
                 -H 'Content-Type: application/vnd.collection+json'
-                -D
+                -d '{ "template": { "data": [ { "name": "name", "value": "Fletch" }, { "name": "description", "value": "Chevy Chase as worlds best detective." }, { "name": "datePublished", "value": "1986-03-28T21:51:08.406Z" }, { "name": "about", "value": "Cheve Chase as LA Detective" }, { "name": "genre", "value": "comedy" }, { "name": "version", "value": "1.0" }, { "name": "timeRequired", "value": "PT100M" }, { "name": "contentRating", "value": "r" } ] } }'
             </pre>
+        <p></p>
+
+
+
     </div>
     <div id="tests">
     </div>
