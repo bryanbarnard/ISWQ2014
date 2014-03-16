@@ -1,6 +1,4 @@
 from mongoengine import *
-import datetime
-import uuid
 
 
 class Movie(Document):
