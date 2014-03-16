@@ -22,6 +22,7 @@ var responseCj = {};
 var responseBody = '';
 var responseHeaders = null;
 var responseStatus = null;
+var queryData = null;
 var requestBody = null;
 var log = bunyan.createLogger({name: "api"});
 
@@ -129,6 +130,7 @@ var handler = function (req, res) {
     root = 'http://' + req.headers.host;
     base = root + '/api/';
     path = url.parse(req.url).pathname;
+    queryData = url.parse(req.url, true).query;
 
 
     //billboard route - RegExp('^\/api\/$','i')
@@ -287,17 +289,27 @@ var sendDeleteResponse = function (req, res, movieId) {
 var sendListResponseMovies = function (req, res) {
     try {
         responseCj = {};
-//        mongoose.models.Movie.find(function (err, movies) {
-//            if (err) {
-//                log.error(err);
-//                sendErrorResponseHelper(req, res, 'Server Error', 500);
-//            }
 
-        var limit = 1;
-        var movies = mongoose.models.Movie.find().limit(limit).sort('-created_on');
+        var offset = 0;
+        var limit = 5; //default page size
+        var movies = null;
 
+        //define query
+        if (queryData.name) {
+            log.info('queryData.name: ' + queryData.name)
+            movies = mongoose.models.Movie.find({name: new RegExp(queryData.name, 'i')}).sort('-created_on').skip(offset).limit(limit);
+        } else {
+            movies = mongoose.models.Movie.find().sort('-created_on').skip(offset).limit(limit);
+        }
+
+        //execute query
         movies.exec(function (err, movies) {
+            if (err) {
+                log.error(err);
+                sendErrorResponseHelper(req, res, 'Server Error', 500);
+            }
 
+            log.info('result count: ' + movies.length);
             if (movies && movies.length > 0) {
                 createResponseCjTemplate();
                 renderMovieCollectionLinks();
