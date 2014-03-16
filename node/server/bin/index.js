@@ -758,7 +758,7 @@ var renderBillboardCollection = function () {
     links.push(linkItem);
 
     linkItem = {};
-    linkItem.href = base + "docs";
+    linkItem.href = "http://bryanbarnard.github.io/ISWQ2014/";
     linkItem.prompt = "API Documentation"
     linkItem.rel = "documentation";
     links.push(linkItem);

@@ -71,7 +71,7 @@ def callback_get_billboard():
         link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
         links.append(link.to_dict())
 
-        link = LinkCJ(ROOT + 'docs', 'API Documentation', 'documentation')
+        link = LinkCJ('http://bryanbarnard.github.io/ISWQ2014/', 'API Documentation', 'documentation')
         links.append(link.to_dict())
 
         collection['version'] = '1.0'
@@ -255,8 +255,6 @@ def callback_post():
         # connect to mongodb
         mongoengine.connect('api')
 
-        # TODO Need to note that we are only expecting a single item to be
-        # TODO created at any time
         movie_dict = dict()
         for item in request_json["template"]["data"]:
             movie_dict[item["name"]] = item["value"]
