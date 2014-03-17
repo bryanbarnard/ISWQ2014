@@ -1,0 +1,20 @@
+<alps version="1.0">
+    <link rel="self" href="https://rawgithub.com/bryanbarnard/iswq2014/master/docs/movies.xml" />
+    <doc format="text">
+        A list of movies that supports search, create, edit and delete
+    </doc>
+    <!--  a movie: one or more of these may be returned -->
+    <descriptor id="movie" type="semantic">
+        <doc>
+            Individual Movie
+        </doc>
+        <descriptor id="link" type="safe">
+            <doc>
+                Link to individual movie
+            </doc>
+        </descriptor>
+        <descriptor id="givenName" type="semantic" href="http://schema.org/givenName"/>
+        <descriptor id="familyName" type="semantic" href="http://schema.org/familyName" />
+        <descriptor id="email" type="semantic" href="http://schema.org/email" />
+        <descriptor id="telephone" type="semantic" href="http://schema.org/telephone"/>
+</alps> 
