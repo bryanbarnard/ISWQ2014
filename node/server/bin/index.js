@@ -29,8 +29,8 @@ var log = bunyan.createLogger({name: "api"});
 
 // Connect to mongodb
 var connect = function () {
-    var options = { server: { socketOptions: { keepAlive: 1 } } }
-    mongoose.connect('mongodb://localhost/api', options)
+    var options = { server: { socketOptions: { keepAlive: 1 } } };
+    mongoose.connect('mongodb://localhost/api', options);
 };
 connect();
 
@@ -652,7 +652,7 @@ var renderMovieCollectionItems = function (coll) {
                 linkItem.name = coll[i].director;
                 linkItem.rel = 'director';
                 linkItem.prompt = 'director of the movie';
-                linkItem.href = base + 'persons/1234'
+                linkItem.href = base + 'persons/1234';
                 linkItem.render = 'link';
                 item.links.push(linkItem);
             }
@@ -664,7 +664,7 @@ var renderMovieCollectionItems = function (coll) {
 
             //data
             dataItem = {};
-            dataItem.name = 'name'
+            dataItem.name = 'name';
             dataItem.value = coll[i].name;
             dataItem.prompt = 'title of the movie';
             item.data.push(dataItem);
@@ -676,13 +676,13 @@ var renderMovieCollectionItems = function (coll) {
             item.data.push(dataItem);
 
             dataItem = {};
-            dataItem.name = 'datePublished'
+            dataItem.name = 'datePublished';
             dataItem.value = coll[i].datePublished;
             dataItem.prompt = 'date movie was published';
             item.data.push(dataItem);
 
             dataItem = {};
-            dataItem.name = 'about'
+            dataItem.name = 'about';
             dataItem.value = coll[i].about;
             dataItem.prompt = 'short description of this item';
             item.data.push(dataItem);
@@ -761,6 +761,7 @@ var renderBillboardCollection = function () {
 
     linkItem = {};
     linkItem.href = 'https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml';
+    linkItem.prompt = "profile";
     linkItem.rel = "profile";
     links.push(linkItem);
 
