@@ -4,20 +4,43 @@
         A list of movies that supports search, create, edit and delete
     </doc>
     
-        
-    <!--  a movie: one or more of these may be returned -->
-    <descriptor id="movie" type="semantic">
+    <!-- a hypermedia control for returning contacts -->
+    <descriptor id="search" type="safe" rt="movie">
         <doc>
-            Individual Movie
+            Simple hypermedia control for getting a list of movies
         </doc>
-        <descriptor id="link" type="safe">
+        <descriptor id="name" type="semantic">
             <doc>
-                Link to individual movie
+                Input for search form
             </doc>
         </descriptor>
-        <descriptor id="givenName" type="semantic" href="http://schema.org/givenName"/>
-        <descriptor id="familyName" type="semantic" href="http://schema.org/familyName" />
-        <descriptor id="email" type="semantic" href="http://schema.org/email" />
-        <descriptor id="telephone" type="semantic" href="http://schema.org/telephone"/>
+    </descriptor>
+    
+    <!--  a movie: one or more of these may be returned -->
+    <descriptor id="movie" type="semantic">
+        <descriptor id="item"type="safe">
+            <doc>
+                Link to individual movie resource
+            </doc>
+        </descriptor>
+        <descriptor id="name" type="semantic" href="http://schema.org/name" />
+        <descriptor id="description" type="semantic" href="http://schema.org/description" />
+        <descriptor id="datePublished" type="semantic" href="http://schema.org/datePublished" />
+        <descriptor id="about" type="semantic" href="http://schema.org/about" />
+        <descriptor id="genre" type="semantic" href="http://schema.org/genre" />
+        <descriptor id="version" type="semantic" href="http://schema.org/version" />
+        <descriptor id="timeRequired" type="semantic" href="http://schema.org/timeRequired" />
+        <descriptor id="contentRating" type="semantic" href="http://schema.org/contentRating" />
+        <descriptor id="director" type="semantic" href="http://schema.org/director">
+        <descriptor id="created_on" type="semantic">
+            <doc>
+                date record was created
+            </doc>
+        </descriptor>
+        <descriptor id="updated_on" type="semantic">
+            <doc>
+                date record was last modified
+            </doc>
+        </descriptor>
     </descriptor>
 </alps> 
