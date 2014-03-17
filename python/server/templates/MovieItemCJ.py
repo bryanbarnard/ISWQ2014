@@ -6,6 +6,8 @@ class MovieItemCJ:
 
     def __init__(self, root, movie):
         self.href = root + 'movies/' + str(movie.sysid)
+        self.rel = 'item'
+        self.rt = 'movie'
 
         self.data = list()
         self.data.append(DataCJ.create("name", movie.name, "title of movie"))
@@ -22,6 +24,13 @@ class MovieItemCJ:
 
         self.links = list()
 
+        link = {
+            'href': "https://rawgithub.com/bryanbarnard/iswq2014/master/docs/movies.xml#movie",
+            'rel': 'type',
+        }
+        self.links.append(link)
+
+
         if movie.director:
             link = {
                 'href': root + 'persons/1234',
@@ -35,6 +44,8 @@ class MovieItemCJ:
     def to_dict(self):
         return {
             'href': self.href,
+            'rel': self.rel,
+            'rt': self.rt,
             'data': self.data,
             'links': self.links
         }

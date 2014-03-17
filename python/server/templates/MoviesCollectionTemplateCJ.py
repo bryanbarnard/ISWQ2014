@@ -20,9 +20,10 @@ class MoviesCollectionTemplateCJ:
         movie_name_query = {
             'href': root + 'movies',
             'rel': 'search',
+            'rt': 'movie',
             'name': 'movie-search',
             'prompt': 'Movie-Search By Name',
-            'data': [dict(name='name', prompt='Name')]
+            'data': [dict(name='name', value='', prompt='Name')]
         }
         self.queries.append(movie_name_query)
 

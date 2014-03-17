@@ -65,13 +65,13 @@ def callback_get_billboard():
         collection = dict()
         links = list()
 
-        link = LinkCJ(ROOT + 'movies-alps.xml', 'profile', 'profile')
+        link = LinkCJ("https://rawgithub.com/bryanbarnard/iswq2014/master/docs/movies.xml", 'profile', 'profile')
         links.append(link.to_dict())
 
         link = LinkCJ(ROOT + 'movies', 'Movies Collection', 'movies')
         links.append(link.to_dict())
 
-        link = LinkCJ('http://bryanbarnard.github.io/ISWQ2014/', 'API Documentation', 'documentation')
+        link = LinkCJ('http://bryanbarnard.github.io/ISWQ2014/', 'API Documentation', 'help')
         links.append(link.to_dict())
 
         collection['version'] = '1.0'
