@@ -760,7 +760,7 @@ var renderBillboardCollection = function () {
     responseCj.collection.href = base;
 
     linkItem = {};
-    linkItem.href = base + "movie-alps.xml";
+    linkItem.href = 'https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml';
     linkItem.rel = "profile";
     links.push(linkItem);
 
@@ -773,7 +773,7 @@ var renderBillboardCollection = function () {
     linkItem = {};
     linkItem.href = "http://bryanbarnard.github.io/ISWQ2014/";
     linkItem.prompt = "API Documentation";
-    linkItem.rel = "about";
+    linkItem.rel = "help";
     links.push(linkItem);
 
     responseCj.collection.links = links;
