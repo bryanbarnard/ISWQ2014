@@ -18,7 +18,7 @@
     
     <!--  a movie: one or more of these may be returned -->
     <descriptor id="movie" type="semantic">
-        <descriptor id="item"type="safe">
+        <descriptor id="item" type="safe">
             <doc>
                 Link to individual movie resource
             </doc>
