@@ -3,23 +3,42 @@
     <link rel="help" href="http://amundsen.com/media-types/collection/format/" />
     <link rel="help" href="http://bryanbarnard.github.io/ISWQ2014/" />
     
-    <doc format="text">
-        A list of movies that supports search, create, edit and delete
+    <doc>
+        Provides access to a list of movies that supports search, create, edit and delete
     </doc>
 
-    <descriptor id="next" type="safe" rt="movie" href="http://www.w3.org/TR/html5/links.html#link-type-next" />
-    <descriptor id="first" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
-    <descriptor id="last" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
-    <descriptor id="previous" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
+    <!-- collection navigation -->
+    <descriptor id="next" type="safe" rt="#movie" href="http://www.w3.org/TR/html5/links.html#link-type-next" />
+    <descriptor id="first" type="safe" rt="#movie" href="http://tools.ietf.org/html/rfc5988" />
+    <descriptor id="last" type="safe" rt="#movie" href="http://tools.ietf.org/html/rfc5988" />
+    <descriptor id="previous" type="safe" rt="#movie" href="http://tools.ietf.org/html/rfc5988" />
 
-    <!-- a hypermedia control for returning contacts -->
-    <descriptor id="search" type="safe" rt="movie">
+    <!-- transitions -->
+    <descriptor id="collection" type="safe" rt="#movie">
+        <doc>list of movies</doc>
+    </descriptor>
+    
+    <descriptor id="edit" type="idempotent" rt="#movie">
+        <doc>Updates a Movie, based on it's href</doc>
+    </descriptor>
+
+    <descriptor id="create" type="unsafe">
+        <doc>Allosw for the creation of a new Movie via template</doc>
+            <descriptor href="#movie" />
+    </descriptor>
+    
+    <descriptor id="delete" type="idempotent">
+        <doc>delete a movie</doc>
+    </descriptor>
+
+    <!-- a hypermedia control for returning movies filtered by name -->
+    <descriptor id="search" type="safe" rt="#movie">
         <doc>
             Simple hypermedia control for getting a list of movies
         </doc>
         <descriptor id="name" type="semantic">
             <doc>
-                Input for search form
+                Input for search form, movie name full or partial
             </doc>
         </descriptor>
     </descriptor>
@@ -42,12 +61,12 @@
         <descriptor id="director" type="semantic" href="http://schema.org/director" />
         <descriptor id="created_on" type="semantic">
             <doc>
-                date record was created
+                datetime record was created
             </doc>
         </descriptor>
         <descriptor id="updated_on" type="semantic">
             <doc>
-                date record was last modified
+                datetime record was last modified
             </doc>
         </descriptor>
     </descriptor>
