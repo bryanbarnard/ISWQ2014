@@ -4,11 +4,11 @@
         A list of movies that supports search, create, edit and delete
     </doc>
 
-    <descriptor id="next" type="safe" rt="movie" href="http://www.w3.org/TR/html5/links.html#link-type-next">
-    <descriptor id="first" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988">
-    <descriptor id="last" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988">
-    <descriptor id="previous" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988">
-    <descriptor id="about" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc6903">
+    <descriptor id="next" type="safe" rt="movie" href="http://www.w3.org/TR/html5/links.html#link-type-next" />
+    <descriptor id="first" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
+    <descriptor id="last" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
+    <descriptor id="previous" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc5988" />
+    <descriptor id="about" type="safe" rt="movie" href="http://tools.ietf.org/html/rfc6903" />
 
     <!-- a hypermedia control for returning contacts -->
     <descriptor id="search" type="safe" rt="movie">
