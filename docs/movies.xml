@@ -12,9 +12,10 @@
             <doc>
                 Link to individual movie
             </doc>
-        </descriptor>
+        
         <descriptor id="givenName" type="semantic" href="http://schema.org/givenName"/>
         <descriptor id="familyName" type="semantic" href="http://schema.org/familyName" />
         <descriptor id="email" type="semantic" href="http://schema.org/email" />
         <descriptor id="telephone" type="semantic" href="http://schema.org/telephone"/>
+        </descriptor>
 </alps> 
