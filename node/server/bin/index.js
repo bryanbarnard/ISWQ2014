@@ -486,7 +486,7 @@ var sendItemResponseMovies = function (req, res, movieId) {
                 responseHeaders = {
                     'Content-Type': contentType,
                     'Content-Length': Buffer.byteLength(responseBody)
-                }
+                };
                 responseStatus = 200;
                 sendResponse(req, res, responseStatus, responseHeaders, responseBody);
             } else {
@@ -618,9 +618,10 @@ var renderMovieCollectionQueries = function () {
     var query = {};
     query.href = base + '/movies';
     query.rel = 'search';
+    query.rt = 'movie';
     query.prompt = 'Movie-Search By Name';
     query.name = 'movie-search';
-    query.data = {'name': 'name', 'prompt': 'Name'};
+    query.data = {'name': 'name', 'value': '', 'prompt': 'Name'};
     responseCj.collection.queries.push(query);
 };
 
@@ -640,6 +641,8 @@ var renderMovieCollectionItems = function (coll) {
             //item
             item = {};
             item.href = base + 'movies/' + coll[i].sysid;
+            item.rel = 'item';
+            item.rt = 'movie';
             item.data = [];
             item.links = [];
 
@@ -653,6 +656,11 @@ var renderMovieCollectionItems = function (coll) {
                 linkItem.render = 'link';
                 item.links.push(linkItem);
             }
+
+            linkItem = {};
+            linkItem.rel = 'type';
+            linkItem.href = 'https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie';
+            item.links.push(linkItem);
 
             //data
             dataItem = {};
@@ -728,8 +736,13 @@ var renderMovieCollectionLinks = function () {
     var link = {};
 
     link = {};
-    link.href = base + 'movie-alps.xml';
+    link.href = 'https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml';
     link.rel = 'profile';
+    responseCj.collection.links.push(link);
+
+    link = {};
+    link.href = 'https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie';
+    link.rel = 'type';
     responseCj.collection.links.push(link);
 };
 
@@ -753,14 +766,14 @@ var renderBillboardCollection = function () {
 
     linkItem = {};
     linkItem.href = base + "movies";
-    linkItem.prompt = "Movies Collection"
+    linkItem.prompt = "Movies Collection";
     linkItem.rel = "movies";
     links.push(linkItem);
 
     linkItem = {};
     linkItem.href = "http://bryanbarnard.github.io/ISWQ2014/";
-    linkItem.prompt = "API Documentation"
-    linkItem.rel = "documentation";
+    linkItem.prompt = "API Documentation";
+    linkItem.rel = "about";
     links.push(linkItem);
 
     responseCj.collection.links = links;
