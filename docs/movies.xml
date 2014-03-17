@@ -1,5 +1,6 @@
 <alps version="1.0">
     <link rel="self" href="https://rawgithub.com/bryanbarnard/iswq2014/master/docs/movies.xml" />
+    <link rel="help" href="http://bryanbarnard.github.io/ISWQ2014/" />
     <doc format="text">
         A list of movies that supports search, create, edit and delete
     </doc>
