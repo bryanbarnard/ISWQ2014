@@ -3,7 +3,7 @@
     <doc format="text">
         A list of movies that supports search, create, edit and delete
     </doc>
-    
+
     <!-- a hypermedia control for returning contacts -->
     <descriptor id="search" type="safe" rt="movie">
         <doc>
@@ -15,7 +15,7 @@
             </doc>
         </descriptor>
     </descriptor>
-    
+
     <!--  a movie: one or more of these may be returned -->
     <descriptor id="movie" type="semantic">
         <descriptor id="item" type="safe">
@@ -31,7 +31,7 @@
         <descriptor id="version" type="semantic" href="http://schema.org/version" />
         <descriptor id="timeRequired" type="semantic" href="http://schema.org/timeRequired" />
         <descriptor id="contentRating" type="semantic" href="http://schema.org/contentRating" />
-        <descriptor id="director" type="semantic" href="http://schema.org/director">
+        <descriptor id="director" type="semantic" href="http://schema.org/director" />
         <descriptor id="created_on" type="semantic">
             <doc>
                 date record was created
