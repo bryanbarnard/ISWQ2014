@@ -1,4 +1,4 @@
-DePaul Independent Study WQ2014 - RESTful Web APIs (ISWQ2014)
+DePaul Independent Study - RESTful Web APIs (ISWQ2014)
 ========
 
 ####Node API Implementation
