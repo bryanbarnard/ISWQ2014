@@ -43,7 +43,7 @@ Content-Type: application/vnd.collection+json
 
 
 # RESPONSE
-201 Content Created
+HTTP/1.1 201 Content Created
 Date: 2014-03-20T21:28:42.438Z
-Location: http://192.241.203.50/api/movies/9aeb95b954504588a84d1dd8a47e77bc
+Location: http://192.241.203.50:1337/api/movies/9aeb95b954504588a84d1dd8a47e77bc
 
