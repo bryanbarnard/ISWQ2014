@@ -1,6 +1,6 @@
 ###Python Implementation README
 
-<b>Installation<b>  
+<b>Installation</b>  
 1.  Clone Repo  
 2.  $ cd ISWQ2014/python/server  
 3.  $ pip install -r requirements.txt  
