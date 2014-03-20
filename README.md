@@ -1,6 +1,5 @@
-ISWQ2014
+DePaul Independent Study WQ2014 - RESTful Web APIs (ISWQ2014)
 ========
-DePaul Independent Study WQ2014 - RESTful Web APIs  
 
 ####Node API Implementation
 - [ISWQ2014/node/server](https://github.com/bryanbarnard/ISWQ2014/tree/master/node/server)
