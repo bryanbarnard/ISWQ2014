@@ -1,5 +1,4 @@
 # Sample Request
-
 GET /api/movies HTTP/1.
 Host:iswq2014.bryanbarnard.com
 X-Target-URI:http://iswq2014.bryanbarnard.com:1337
