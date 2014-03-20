@@ -2,9 +2,9 @@
 
 <b>Installation<b>  
 1.  Clone Repo  
-2.  $ cd ISWQ2014/python/server
-3.  $ pip install -r requirements.txt
-4.  $ python app.py
+2.  $ cd ISWQ2014/python/server  
+3.  $ pip install -r requirements.txt  
+4.  $ python app.py  
 
 <b>Simple Test</b>  
 $ curl -v http://localhost:1338/api/api
