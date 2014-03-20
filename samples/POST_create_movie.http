@@ -1,0 +1,49 @@
+# REQUEST
+POST 192.241.203.50:1337 
+Accept: application/vnd.collection+json
+Content-Type: application/vnd.collection+json
+{
+  "template": {
+    "data": [
+      {
+        "name": "name",
+        "value": "Fletch Lives"
+      },
+      {
+        "name": "description",
+        "value": "Chevy Chase as worlds best detective"
+      },
+      {
+        "name": "datePublished",
+        "value": "1993-03-28T21:51:08.406Z"
+      },
+      {
+        "name": "about",
+        "value": "Police, detective"
+      },
+      {
+        "name": "genre",
+        "value": "comedy"
+      },
+      {
+        "name": "version",
+        "value": "2.0"
+      },
+      {
+        "name": "timeRequired",
+        "value": "PT100M"
+      },
+      {
+        "name": "contentRating",
+        "value": "r"
+      }
+    ]
+  }
+}
+
+
+# RESPONSE
+201 Content Created
+Date: 2014-03-20T21:28:42.438Z
+Location: http://192.241.203.50/api/movies/9aeb95b954504588a84d1dd8a47e77bc
+
