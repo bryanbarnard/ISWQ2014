@@ -1,8 +1,8 @@
 ###NODEJS Server Implementation README
 
-<b>Installation<b>  
+<b>Installation</b>  
 1.  Clone Repo  
-2.  $ cd bin  
+2.  $ cd ISWQ2014/node/bin  
 3.  $ npm install  
 4.  $ node index.js  
 
