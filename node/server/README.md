@@ -1,10 +1,10 @@
 ###NODEJS Server Implementation README
 
 <b>Installation<b>  
-- Clone Repo  
-- $ cd bin  
-- $ npm install  
-- $ node index.js  
+1.  Clone Repo  
+2.  $ cd bin  
+3.  $ npm install  
+4.  $ node index.js  
 
 <b>Simple Test</b>  
 $ curl -v http://localhost:1337/api/api
