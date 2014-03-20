@@ -616,7 +616,7 @@ var renderMovieCollectionTemplate = function () {
  */
 var renderMovieCollectionQueries = function () {
     var query = {};
-    query.href = base + '/movies';
+    query.href = base + 'movies';
     query.rel = 'search';
     query.rt = 'movie';
     query.prompt = 'Movie-Search By Name';
