@@ -1,187 +1,288 @@
 {
-    "collection": {
-        "version": "1.0",
-        "href": "http://localhost:1337/api/movies",
-        "items": [
-            {
-                "href": "http://localhost:1337/api/movies/613856331910938",
-                "data": [
-                    {
-                        "name": "description",
-                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher."
-                    },
-                    {
-                        "name": "datePublished",
-                        "value": "2013-03-28T21:51:08.406Z"
-                    },
-                    {
-                        "name": "name",
-                        "value": "Caddyshack"
-                    },
-                    {
-                        "name": "about",
-                        "value": "An exclusive golf course has to deal with a brash new member and a destructive dancing gopher."
-                    },
-                    {
-                        "name": "genre",
-                        "value": "comedy"
-                    },
-                    {
-                        "name": "version",
-                        "value": 1
-                    },
-                    {
-                        "name": "timeRequired",
-                        "value": "PT180M"
-                    },
-                    {
-                        "name": "contentRating",
-                        "value": 5
-                    }
-                ],
-                "links": [
-                    {
-                        "name": "Martin Scorcese",
-                        "rel": "director",
-                        "prompt": "movie director",
-                        "href": "http://localhost:1337/persons/abcdefghijk",
-                        "render": "link"
-                    },
-                    {
-                        "name": "Brad Pitt",
-                        "rel": "actor",
-                        "prompt": "movie actor",
-                        "href": "http://localhost:1337/persons/abcdefghij2",
-                        "render": "link"
-                    },
-                    {
-                        "name": "Will Smith",
-                        "rel": "actor",
-                        "prompt": "movie actor",
-                        "href": "http://localhost:1337/persons/abcdefghij7",
-                        "render": "link"
-                    }
-
-                ]
-            },
-            {
-                "href": "http://localhost:1337/api/movies/613856331910937",
-                "data": [
-                    {
-                        "name": "description",
-                        "value": "Ghosts arrive in Manhattan. Who you gonna call?"
-                    },
-                    {
-                        "name": "datePublished",
-                        "value": "2013-03-24T21:51:08.406Z"
-                    },
-                    {
-                        "name": "name",
-                        "value": "Ghostbusters"
-                    },
-                    {
-                        "name": "about",
-                        "value": "Ghosts arrive in Manhattan. Who you gonna call?"
-                    },
-                    {
-                        "name": "genre",
-                        "value": "comedy"
-                    },
-                    {
-                        "name": "version",
-                        "value": 1
-                    },
-                    {
-                        "name": "timeRequired",
-                        "value": "PT190M"
-                    },
-                    {
-                        "name": "contentRating",
-                        "value": 4
-                    }
-                ],
-                "links": [
-                    {
-                        "name": "director",
-                        "rel": "director",
-                        "prompt": "the director of the movie",
-                        "href": "/persons/abcdefghijk",
-                        "render": "link"
-                    }
-                ]
-            }
+  "collection": {
+    "version": "1.0",
+    "href": "http://192.241.203.50:1337/api/movies?offset=0&limit=5",
+    "links": [
+      {
+        "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml",
+        "rel": "profile"
+      },
+      {
+        "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie",
+        "rel": "type"
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies",
+        "rel": "first",
+        "prompt": "first page of results"
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies",
+        "rel": "previous",
+        "prompt": "immediate previous page results"
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies?offset=-2&limit=5",
+        "rel": "last",
+        "prompt": "last page of results"
+      }
+    ],
+    "items": [
+      {
+        "href": "http://192.241.203.50:1337/api/movies/ce22e7b3bdf64c61892922f9c8f79363",
+        "rel": "item",
+        "rt": "movie",
+        "data": [
+          {
+            "name": "name",
+            "value": "So I Married An Axe Murderer 004",
+            "prompt": "title of the movie"
+          },
+          {
+            "name": "description",
+            "value": "A San Francisco poet who fears commitment has a girlfriend who he suspects may not be who she appears.",
+            "prompt": "description of movie"
+          },
+          {
+            "name": "datePublished",
+            "value": "1993-03-28T21:51:08.406Z",
+            "prompt": "date movie was published"
+          },
+          {
+            "name": "about",
+            "value": "Cult Classic Michael Myers",
+            "prompt": "short description of this item"
+          },
+          {
+            "name": "genre",
+            "value": "comedy",
+            "prompt": "movie genre"
+          },
+          {
+            "name": "version",
+            "value": "1.0",
+            "prompt": "version of this release"
+          },
+          {
+            "name": "timeRequired",
+            "value": "PT120M",
+            "prompt": "time required to view this movie, aka duration"
+          },
+          {
+            "name": "contentRating",
+            "value": "r",
+            "prompt": "rating of the movie"
+          },
+          {
+            "name": "created",
+            "value": "2014-03-21T01:36:52.751Z",
+            "prompt": "record created"
+          },
+          {
+            "name": "updated",
+            "value": "2014-03-21T01:36:52.751Z",
+            "prompt": "record last updated"
+          }
         ],
-        "queries": [],
         "links": [
-            {
-                "href": "http://localhost:1337/movie-alps.xml",
-                "rel": "profile"
-            },
-            {
-                "href": "http://localhost:1337/api/movies/",
-                "rel": "movies"
-            },
-            {
-                "href": "http://localhost:1337/api/persons/",
-                "rel": "persons"
-            }
+          {
+            "rel": "type",
+            "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies/f47caa86c98948c5824ac33550e1d31f",
+        "rel": "item",
+        "rt": "movie",
+        "data": [
+          {
+            "name": "name",
+            "value": "So I Married An Axe Murderer 002",
+            "prompt": "title of the movie"
+          },
+          {
+            "name": "description",
+            "value": "A San Francisco poet who fears commitment has a girlfriend who he suspects may not be who she appears.",
+            "prompt": "description of movie"
+          },
+          {
+            "name": "datePublished",
+            "value": "1993-03-28T21:51:08.406Z",
+            "prompt": "date movie was published"
+          },
+          {
+            "name": "about",
+            "value": "Cult Classic Michael Myers",
+            "prompt": "short description of this item"
+          },
+          {
+            "name": "genre",
+            "value": "comedy",
+            "prompt": "movie genre"
+          },
+          {
+            "name": "version",
+            "value": "1.0",
+            "prompt": "version of this release"
+          },
+          {
+            "name": "timeRequired",
+            "value": "PT120M",
+            "prompt": "time required to view this movie, aka duration"
+          },
+          {
+            "name": "contentRating",
+            "value": "r",
+            "prompt": "rating of the movie"
+          },
+          {
+            "name": "created",
+            "value": "2014-03-21T01:36:42.052Z",
+            "prompt": "record created"
+          },
+          {
+            "name": "updated",
+            "value": "2014-03-21T01:36:42.052Z",
+            "prompt": "record last updated"
+          }
         ],
-        "template": {
-            "data": [
-                {
-                    "name": "description",
-                    "value": "",
-                    "prompt": "description of movie",
-                    "required": "true"
-                },
-                {
-                    "name": "datePublished",
-                    "value": "",
-                    "prompt": "date movie was published",
-                    "required": "true"
-                },
-                {
-                    "name": "name",
-                    "value": "",
-                    "prompt": "title of the movie",
-                    "required": "true"
-                },
-                {
-                    "name": "about",
-                    "value": "",
-                    "prompt": "short description of this item",
-                    "required": "true"
-                },
-                {
-                    "name": "genre",
-                    "value": "",
-                    "prompt": "movie genre",
-                    "required": "true"
-                },
-                {
-                    "name": "version",
-                    "value": "",
-                    "prompt": "version of this release",
-                    "required": "true"
-                },
-                {
-                    "name": "timeRequired",
-                    "value": "",
-                    "prompt": "time required to view this movie also known as duration",
-                    "required": "true"
-                },
-                {
-                    "name": "contentRating",
-                    "value": "",
-                    "prompt": "rating of the movie (1-5)",
-                    "required": "true"
-                }
-            ]
-        },
-        "error": {
-            "title": "''",
-            "code": "''",
-            "message": "''"
+        "links": [
+          {
+            "rel": "type",
+            "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie"
+          }
+        ]
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies/0ef76a3969944f26972746df07eda32c",
+        "rel": "item",
+        "rt": "movie",
+        "data": [
+          {
+            "name": "name",
+            "value": "So I Married An Axe Murderer 001",
+            "prompt": "title of the movie"
+          },
+          {
+            "name": "description",
+            "value": "A San Francisco poet who fears commitment has a girlfriend who he suspects may not be who she appears.",
+            "prompt": "description of movie"
+          },
+          {
+            "name": "datePublished",
+            "value": "1993-03-28T21:51:08.406Z",
+            "prompt": "date movie was published"
+          },
+          {
+            "name": "about",
+            "value": "Cult Classic Michael Myers",
+            "prompt": "short description of this item"
+          },
+          {
+            "name": "genre",
+            "value": "comedy",
+            "prompt": "movie genre"
+          },
+          {
+            "name": "version",
+            "value": "1.0",
+            "prompt": "version of this release"
+          },
+          {
+            "name": "timeRequired",
+            "value": "PT120M",
+            "prompt": "time required to view this movie, aka duration"
+          },
+          {
+            "name": "contentRating",
+            "value": "r",
+            "prompt": "rating of the movie"
+          },
+          {
+            "name": "created",
+            "value": "2014-03-21T01:36:34.552Z",
+            "prompt": "record created"
+          },
+          {
+            "name": "updated",
+            "value": "2014-03-21T01:36:34.552Z",
+            "prompt": "record last updated"
+          }
+        ],
+        "links": [
+          {
+            "rel": "type",
+            "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml#movie"
+          }
+        ]
+      }
+    ],
+    "queries": [
+      {
+        "href": "http://192.241.203.50:1337/api/movies",
+        "rel": "search",
+        "rt": "movie",
+        "prompt": "Movie-Search By Name",
+        "name": "movie-search",
+        "data": {
+          "name": "name",
+          "value": "",
+          "prompt": "Name"
         }
+      }
+    ],
+    "template": {
+      "data": [
+        {
+          "name": "name",
+          "value": "",
+          "prompt": "title of movie",
+          "required": "true"
+        },
+        {
+          "name": "description",
+          "value": "",
+          "prompt": "description of movie",
+          "required": "true"
+        },
+        {
+          "name": "datePublished",
+          "value": "",
+          "prompt": "date movie was published",
+          "required": "true"
+        },
+        {
+          "name": "about",
+          "value": "",
+          "prompt": "short description of film",
+          "required": "true"
+        },
+        {
+          "name": "genre",
+          "value": "",
+          "prompt": "movie genre",
+          "required": "true"
+        },
+        {
+          "name": "version",
+          "value": "",
+          "prompt": "version of this release",
+          "required": "true"
+        },
+        {
+          "name": "timeRequired",
+          "value": "",
+          "prompt": "time required to view this movie aka duration",
+          "required": "true"
+        },
+        {
+          "name": "contentRating",
+          "value": "",
+          "prompt": "movie content rating",
+          "required": "true"
+        }
+      ]
     }
+  }
 }
