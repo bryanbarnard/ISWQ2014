@@ -1,2 +1,12 @@
 #REQUEST
+DELETE /api/movies/2da1e312f621453b9f1c42f2de135f18 HTTP/1.1
+Host:192.241.203.50
+X-Target-URI:http://192.241.203.50:1337
+Connection:Close
+
+
 #RESPONSE
+HTTP/1.1 204 No Content
+Date:2014-03-21T04:14:59.808Z
+Content-Length:0
+Cache-Control:no-cache, no-store, must-revalidate
