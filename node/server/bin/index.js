@@ -9,7 +9,7 @@ var bunyan = require('bunyan');
 var fs = require('fs');
 
 //variables
-var port = (process.env.PORT || 1337);
+var port =  1337;
 var root = '';
 var path = '';
 var base = '/';
@@ -65,7 +65,8 @@ fs.readdirSync('../models').forEach(function (file) {
  * Route Patterns
  */
 var reAPIBillboard = new RegExp('^\/api\/$', 'i');
-var reAPIListMovies = new RegExp('^\/api\/movies.*', 'i');
+var reAPIListMovies = new RegExp('^\/api\/movies$', 'i');
+var reAPIListMoviesParams = new RegExp('^\/api\/movies\\?.*', 'i');
 var reAPIItemMovies = new RegExp('^\/api\/movies\/.*', 'i');
 
 
@@ -92,7 +93,9 @@ var handler = function (req, res) {
     }
 
     flg = false;
+//    root = 'http://' + req.headers.host + ':' + port;
     root = 'http://' + req.headers.host;
+    console.log('root: ' + root);
     base = root + '/api/';
     path = url.parse(req.url).pathname;
     queryData = url.parse(req.url, true).query;
@@ -124,6 +127,22 @@ var handler = function (req, res) {
                 break;
             case 'POST':
                 sendAddMovieResponse(req, res);
+                break;
+            default:
+                sendErrorResponse(req, res, 'Method Not Allowed', 405);
+                break;
+        }
+    }
+
+
+    //movies collection route - RegExp('^\/api\/movies?.*','i')
+    if (flg === false && reAPIListMoviesParams.test(req.url)) {
+        flg = true;
+        log.info('request handler route => ' + req.method + ':reAPIListMoviesParams');
+
+        switch (req.method) {
+            case 'GET':
+                sendListResponseMovies(req, res);
                 break;
             default:
                 sendErrorResponse(req, res, 'Method Not Allowed', 405);
@@ -318,7 +337,7 @@ var sendListResponseMovies = function (req, res) {
 
                 // next page of movies
                 if(pageend < movies.length) {
-                    var link = {};
+                    link = {};
                     link.href = base + 'movies?name=' + queryData.name + '&offset=' + (offset + limit).toString() +
                         '&limit=' + limit.toString();
                     link.rel = 'next';
@@ -327,7 +346,7 @@ var sendListResponseMovies = function (req, res) {
                 }
 
                 // prev page of movies
-                var link = {};
+                    link = {};
                 if (offset < limit) {
                     link.href = base + 'movies?name=' + queryData.name;
                 } else {
@@ -340,7 +359,7 @@ var sendListResponseMovies = function (req, res) {
                 responseCj.collection.links.push(link);
 
                 //last
-                var link = {};
+                link = {};
                 link.href = base + 'movies?name=' + queryData.name + '&offset=' + (movies.length - limit).toString() +
                     '&limit=' + limit.toString();
                 link.rel = 'last';
@@ -362,7 +381,7 @@ var sendListResponseMovies = function (req, res) {
 
                 // next page of movies
                 if(pageend < movies.length) {
-                    var link = {};
+                    link = {};
                     link.href = base + 'movies?offset=' + (offset + limit).toString() +
                         '&limit=' + limit.toString();
                     link.rel = 'next';
@@ -371,7 +390,7 @@ var sendListResponseMovies = function (req, res) {
                 }
 
                 // prev page of movies
-                var link = {};
+                link = {};
                 if (offset < limit) {
                     link.href = base + 'movies';
                 } else {
@@ -383,7 +402,7 @@ var sendListResponseMovies = function (req, res) {
                 responseCj.collection.links.push(link);
 
                 //last
-                var link = {};
+                link = {};
                 link.href = base + 'movies?offset=' + (movies.length - limit).toString() +
                     '&limit=' + limit.toString();
                 link.rel = 'last';
@@ -493,7 +512,7 @@ var sendItemResponseMovies = function (req, res, movieId) {
                 responseBody = null;
                 responseHeaders = {
                     'Content-Type': contentType
-                }
+                };
                 responseStatus = 404;
                 sendResponse(req, res, responseStatus, responseHeaders, responseBody);
             }
@@ -523,7 +542,7 @@ var sendErrorResponseHelper = function (req, res, title, code) {
     responseHeaders = {
         'Content-Type': contentType,
         'Content-Length': Buffer.byteLength(responseBody)
-    }
+    };
     responseStatus = code;
 
     sendResponse(req, res, responseStatus, responseHeaders, responseBody);
@@ -788,7 +807,7 @@ var genId = function () {
     var id = uuid();
     id = id.replace(/-/g, '');
     return id;
-}
+};
 
 
 /**
