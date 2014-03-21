@@ -1,0 +1,37 @@
+# Request
+GET /api/ HTTP/1.1
+Host:192.241.203.50
+X-Target-URI: http://192.241.203.50:1337
+Accept: application/vnd.collection+json
+Connection: Keep-Alive
+
+# Response
+HTTP/1.1 200 OK
+Date:2014-03-21T04:18:19.740Z
+Content-Length:382
+Content-Type:application/vnd.collection+json
+Cache-Control:no-cache, no-store, must-revalidate
+
+{
+  "collection": {
+    "version": "1.0",
+    "href": "http://192.241.203.50:1337/api/",
+    "links": [
+      {
+        "href": "https://rawgithub.com/bryanbarnard/ISWQ2014/master/docs/movies.xml",
+        "prompt": "profile",
+        "rel": "profile"
+      },
+      {
+        "href": "http://192.241.203.50:1337/api/movies",
+        "prompt": "Movies Collection",
+        "rel": "movies"
+      },
+      {
+        "href": "http://bryanbarnard.github.io/ISWQ2014/",
+        "prompt": "API Documentation",
+        "rel": "help"
+      }
+    ]
+  }
+}
