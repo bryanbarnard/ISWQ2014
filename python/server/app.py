@@ -18,8 +18,9 @@ from templates.MovieItemCJ import MovieItemCJ
 from templates.MoviesCollectionTemplateCJ import MoviesCollectionTemplateCJ
 import mongoengine
 import datetime
+import uuid
 
-
+# must switch this depending on where deployed
 HOST = 'localhost'
 PORT = 1338
 PATH = '/api/'
@@ -316,7 +317,6 @@ def callback_put(mid):
             response.status = 204
             return
 
-        # TODO Cleanup
         if "data" not in request_json["template"]:
             print 'error data not found'
 
