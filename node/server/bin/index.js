@@ -7,6 +7,7 @@ var querystring = require('querystring');
 var mongoose = require('mongoose');
 var bunyan = require('bunyan');
 var fs = require('fs');
+var logentries = require('node-logentries');
 
 //variables
 var port =  1337;
@@ -21,6 +22,9 @@ var responseStatus = null;
 var queryData = null;
 var requestBody = null;
 var log = bunyan.createLogger({name: "api"});
+var logger = logentries.logger({
+    token:'03ac1839-5c2f-41f7-bd78-5c13727cd60c'
+});
 
 
 /**
@@ -95,7 +99,6 @@ var handler = function (req, res) {
     flg = false;
 //    root = 'http://' + req.headers.host + ':' + port;
     root = 'http://' + req.headers.host;
-    console.log('root: ' + root);
     base = root + '/api/';
     path = url.parse(req.url).pathname;
     queryData = url.parse(req.url, true).query;
@@ -105,6 +108,7 @@ var handler = function (req, res) {
     if (reAPIBillboard.test(req.url)) {
         flg = true;
         log.info('request handler route => ' + req.method + ':reAPIBillboard');
+        logger.info('request handler route => ' + req.method + ':reAPIBillboard');
 
         switch (req.method) {
             case 'GET':
@@ -120,6 +124,7 @@ var handler = function (req, res) {
     if (flg === false && reAPIListMovies.test(req.url)) {
         flg = true;
         log.info('request handler route => ' + req.method + ':reAPIListMovies');
+        logger.info('request handler route => ' + req.method + ':reAPIListMovies');
 
         switch (req.method) {
             case 'GET':
@@ -139,6 +144,7 @@ var handler = function (req, res) {
     if (flg === false && reAPIListMoviesParams.test(req.url)) {
         flg = true;
         log.info('request handler route => ' + req.method + ':reAPIListMoviesParams');
+        logger.info('request handler route => ' + req.method + ':reAPIListMoviesParams');
 
         switch (req.method) {
             case 'GET':
@@ -154,6 +160,7 @@ var handler = function (req, res) {
     if (flg === false && reAPIItemMovies.test(req.url)) {
         flg = true;
         log.info('request handler route => ' + req.method + ':reAPIItemMovies');
+        logger.info('request handler route => ' + req.method + ':reAPIItemMovies');
 
         switch (req.method) {
             case 'GET':
@@ -230,6 +237,7 @@ var sendAddMovieResponse = function (req, res) {
             movieInstance.save(function (err, movieInstance) {
                 if (err) {
                     log.error(err);
+                    logger.error(err);
                     sendErrorResponseHelper(req, res, 'Server Error', 500);
                 }
                 responseBody = '';
@@ -253,9 +261,11 @@ var sendDeleteResponse = function (req, res, movieId) {
         mongoose.models.Movie.findOneAndRemove({sysid: movieId}, function (err, movie) {
             if (err) {
                 log.error(err);
+                logger.error(err);
                 sendErrorResponseHelper(req, res, 'Server Error', 500);
             }
             log.info('movie ' + movieId + ' - ' + movie.name + ' deleted from db');
+            logger.info('movie ' + movieId + ' - ' + movie.name + ' deleted from db');
         });
 
         responseBody = '';
@@ -295,7 +305,6 @@ var sendListResponseMovies = function (req, res) {
 
         //define query
         if (queryData.name) {
-            log.info('queryData.name: ' + queryData.name);
             movies = mongoose.models.Movie.find({name: new RegExp(queryData.name, 'i')}).sort('-created_on');
         } else {
             movies = mongoose.models.Movie.find().sort('-created_on');
@@ -310,13 +319,12 @@ var sendListResponseMovies = function (req, res) {
         movies.exec(function (err, movies) {
             if (err) {
                 log.error(err);
+                logger.error(err);
                 sendErrorResponseHelper(req, res, 'Server Error', 500);
             }
 
-            log.info(movies.length + ' records found matching query passed to mongoDB');
 
             if (movies && movies.length > 0) {
-                log.info('pagestart: ' + pagestart + ' pageend: ' + pageend);
                 renderMovieCollectionItems(movies.slice(pagestart, pageend));
             } else {
                 responseCj.collection.items = [];
@@ -437,6 +445,7 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
         try {
             var requestMsg = JSON.parse(requestBody);
             log.info({requestMsg: requestMsg}, "log incoming movie put");
+            logger.info({requestMsg: requestMsg}, "log incoming movie put");
 
             var movie = {};
             for (var i = 0; i < requestMsg.template.data.length; i++) {
@@ -447,13 +456,14 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
             movieInstance.validate(function (err) {
                 if (err) {
                     log.error(err);
+                    logger.error(err);
                     sendErrorResponseHelper(req, res, 'missing required parameter', 500);
                 }
 
-                log.info('validated successfully');
                 mongoose.models.Movie.findOne({'sysid': movieId}, function (err, existingMovie) {
                     if (err) {
                         log.error(err);
+                        logger.error(err);
                         sendErrorResponseHelper(req, res, 'Movie not found for updating, check ID', 500);
                     }
 
@@ -467,7 +477,6 @@ var sendItemUpdateResponseMovies = function (req, res, movieId) {
                     existingMovie.contentRating = movie.contentRating;
                     existingMovie.updated_on = new Date();
 
-                    log.info({existingMovie: existingMovie});
                     existingMovie.save(function (err) {
                         if (err) {
                             sendErrorResponseHelper(req, res, 'Failed updating movie', 500);
@@ -491,6 +500,7 @@ var sendItemResponseMovies = function (req, res, movieId) {
         mongoose.models.Movie.findOne({'sysid': movieId}, function (err, movie) {
             if (err) {
                 log.error(err);
+                logger.error(err);
                 sendErrorResponseHelper(req, res, 'Error, Invalid ID', 204);
             }
 
@@ -649,7 +659,6 @@ var renderMovieCollectionQueries = function () {
  */
 var renderMovieCollectionItems = function (coll) {
 
-    log.info('coll.length: ' + coll.length);
     var item, dataItem, linkItem;
     responseCj.collection.items = [];
 
@@ -827,6 +836,7 @@ var createResponseCjTemplate = function () {
 //main
 http.createServer(handler).listen(port);
 log.info('http server listening http://localhost:' + port + '/api/');
+logger.info('http server listening http://localhost:' + port + '/api/');
 
 /**
  * Sample CURL Requests
